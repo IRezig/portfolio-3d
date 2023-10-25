@@ -20,12 +20,10 @@ export const useCameraHandler = () => {
     focused = true;
     previousPosition = cameraLookAt;
     focusPosition(1.2, position);
-    console.log('focusing to', position);
   };
 
   const unfocusObject = () => {
     if (previousPosition) {
-      console.log('unfocusing to', previousPosition);
       focusPosition(0.7, previousPosition, () => {
         focused = false;
       });
