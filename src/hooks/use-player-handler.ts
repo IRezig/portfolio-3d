@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { MutableRefObject } from 'react';
-import { Group } from 'three';
+import { Group, Vector3 } from 'three';
 
 import { useMenuContext } from '../context/menu-context';
 import { useSceneContext } from '../context/scene-context';
@@ -38,8 +38,6 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
       directionZ = keys.zAxis[key];
     }
 
-    console.log(key);
-
     // Handle focus state
     if (isFocused()) {
       if (key === SPACE_KEY) {
@@ -70,6 +68,19 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
     }
   });
 
+  const checkDistanceWithBall = (currentPos: Vector3) => {
+    const ball = objects.ball;
+    if (ball?.current) {
+      const position = ball.current.position;
+      const distWithBall = currentPos.distanceTo(position);
+      if (distWithBall < 20) {
+        showMenu(true);
+      } else {
+        showMenu(false);
+      }
+    }
+  };
+
   useFrame(({ camera }) => {
     if (ref.current) {
       if (isFocused()) {
@@ -93,19 +104,7 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
           ref.current.position.z,
         );
 
-        const ball = objects.ball;
-        //console.log('focus on ball', ball?.current?.position);
-        if (ball?.current) {
-          const position = ball.current.position;
-          // Handle focus on ball
-          // ... when approaching given distance
-          const distWithBall = ref.current.position.distanceTo(position);
-          if (distWithBall < 20) {
-            showMenu(true);
-          } else {
-            showMenu(false);
-          }
-        }
+        checkDistanceWithBall(ref.current.position);
       }
     }
   });
