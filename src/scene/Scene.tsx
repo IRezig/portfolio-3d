@@ -8,7 +8,7 @@ export default function Scene() {
   useInteractions();
 
   return (
-    <Canvas camera={{ position: [0, 0, 20] }}>
+    <Canvas camera={{ position: [0, 20, 20] }}>
       <SceneObjects />
       <SceneSetup />
     </Canvas>
