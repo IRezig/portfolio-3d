@@ -1,4 +1,4 @@
-import { Trail } from '@react-three/drei';
+import { Sphere, Trail } from '@react-three/drei';
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { Color, Mesh } from 'three';
@@ -26,7 +26,7 @@ export const Electron = ({
     <group {...props}>
       <Trail width={5} length={6} color={new Color(2, 1, 10)} attenuation={(t) => t * t}>
         <mesh ref={ref}>
-          <sphereGeometry {...{ args: [0.25] }} />
+          <Sphere args={[0.25]} />
           <meshBasicMaterial color={[10, 1, 10]} />
         </mesh>
       </Trail>
