@@ -1,12 +1,13 @@
 /* eslint-disable */
-import { Float, Sphere, Stars } from '@react-three/drei';
+import { Float, Plane, Sphere, Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
-import { useCameraHandler, useFocusCamera } from './hooks/use-camera-handler';
+import { useCameraHandler, useFocusCamera } from '../hooks/use-camera-handler';
 import { Atom } from './Atom';
 import { useEffect } from 'react';
 import { CameraAnimationHandler } from './Camera';
+import { Euler } from 'three';
 
 const FloatingAtom = () => {
   return (
@@ -37,6 +38,8 @@ export default function Scene() {
     document.addEventListener('keydown', (event) => onKeyPress(event.key));
   }, []);
 
+  const groundRotation = new Euler(30, 0, 0);
+
   return (
     <Canvas camera={{ position: [0, 0, 20] }}>
       <CameraAnimationHandler />
@@ -46,11 +49,16 @@ export default function Scene() {
           <meshBasicMaterial color={[6, 0.5, 2]} />
         </Sphere>
       </group>
-      <FloatingAtom />
+      <Plane args={[100, 100]} rotation={groundRotation} position={[0, -20, 0]}>
+        <meshBasicMaterial color={[6, 0.5, 2]} />
+      </Plane>
+      <group>
+        <FloatingAtom />
+        <EffectComposer>
+          <Bloom mipmapBlur luminanceThreshold={1} radius={0.7} />
+        </EffectComposer>
+      </group>
       <Stars saturation={0} count={400} speed={0.5} />
-      <EffectComposer>
-        <Bloom mipmapBlur luminanceThreshold={1} radius={0.7} />
-      </EffectComposer>
     </Canvas>
   );
 }

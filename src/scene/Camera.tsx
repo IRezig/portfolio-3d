@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 
-import { useCameraHandler } from './hooks/use-camera-handler';
+import { useCameraHandler } from '../hooks/use-camera-handler';
 
 export const CameraAnimationHandler = () => {
   const { runAnimation } = useCameraHandler();
