@@ -49,7 +49,7 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
           const ball = objects.ball;
           if (ball?.current) {
             const position = ball.current.position;
-            focusObject(position.toArray());
+            focusObject(position);
             showMenu(false);
           }
         }
@@ -83,18 +83,14 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
     if (ref.current) {
       if (isFocused()) {
         // Handle camera focus
-        const res = runAnimationFrame();
-        if (res) {
-          const [x, y, z] = res;
-          camera.lookAt(x, y, z);
-        }
+        runAnimationFrame(camera);
       } else {
         // Handle player movement
         ref.current.position.x += directionX * 1;
         ref.current.position.z += directionZ * 1;
         camera.position.x += directionX * 1;
         camera.position.z += directionZ * 1;
-        syncLook(ref.current.position.toArray());
+        syncLook(ref.current.position);
 
         camera.lookAt(
           ref.current.position.x,

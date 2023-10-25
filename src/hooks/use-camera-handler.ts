@@ -1,22 +1,23 @@
-import { Clock } from 'three';
+import { Camera } from '@react-three/fiber';
+import { Clock, Vector3 } from 'three';
 
 interface AnimProperties {
-  start: number[];
-  end: number[];
+  startLook: Vector3;
+  endLook: Vector3;
   clock: Clock;
   duration: number;
   callback?: () => void;
 }
 
-let cameraLookAt = [0, 0, 0];
+let cameraLookAt = new Vector3(0, 0, 0);
 let focused = false;
-let currentAnim: AnimProperties | null = null;
-let previousPosition: number[] | null = null;
+let focusAnim: AnimProperties | null = null;
+let previousPosition: Vector3 | null = null;
 
 export const useCameraHandler = () => {
   const isFocused = () => focused;
 
-  const focusObject = (position: number[]) => {
+  const focusObject = (position: Vector3) => {
     focused = true;
     previousPosition = cameraLookAt;
     focusPosition(1.2, position);
@@ -30,36 +31,46 @@ export const useCameraHandler = () => {
     }
   };
 
-  const focusPosition = (duration: number, pos: number[], callback?: () => void) => {
-    currentAnim = {
-      start: cameraLookAt,
-      end: pos,
+  const focusPosition = (duration: number, pos: Vector3, callback?: () => void) => {
+    focusAnim = {
+      startLook: cameraLookAt,
+      endLook: pos,
       clock: new Clock(),
       duration,
       callback,
     };
   };
 
-  const syncLook = (pos: number[]) => {
+  const syncLook = (pos: Vector3) => {
     cameraLookAt = pos;
   };
 
-  const runAnimationFrame = () => {
-    if (!currentAnim) {
+  const runAnimationFrame = (camera: Camera) => {
+    if (!focusAnim) {
       return null;
     }
-    const { start, end, clock, duration, callback } = currentAnim;
-    const diff = end.map((n, index) => n - start[index]);
+    const { startLook, endLook, clock, duration, callback } = focusAnim;
+    const diff = {
+      x: endLook.x - startLook.x,
+      y: endLook.y - startLook.y,
+      z: endLook.z - startLook.z,
+    };
     const progress = clock.getElapsedTime() / duration;
-    cameraLookAt = start.map((n, index) => n + diff[index] * progress);
-    if (progress >= 1) {
-      currentAnim = null;
+    const calcLook = (n: number, diff: number) => n + diff * progress;
+    cameraLookAt = new Vector3(
+      calcLook(startLook.x, diff.x),
+      calcLook(startLook.y, diff.y),
+      calcLook(startLook.z, diff.z),
+    );
+
+    if (progress <= 1) {
+      camera.lookAt(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
+    } else {
+      focusAnim = null;
       if (callback) {
         callback();
       }
     }
-
-    return cameraLookAt;
   };
 
   return {
