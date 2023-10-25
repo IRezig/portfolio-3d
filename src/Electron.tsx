@@ -1,12 +1,21 @@
 /* eslint-disable */
 import { Trail } from '@react-three/drei';
-import { BoxGeometryProps, GroupProps, SphereGeometryProps, useFrame } from '@react-three/fiber';
+import {
+  BoxGeometryProps,
+  GroupProps,
+  SphereGeometryProps,
+  useFrame,
+} from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
 
-const Electron = ({ radius = 2.75, speed = 6, ...props }: GroupProps & {
-  speed?: number
-  radius?: number
+const Electron = ({
+  radius = 2.75,
+  speed = 6,
+  ...props
+}: GroupProps & {
+  speed?: number;
+  radius?: number;
 }) => {
   const ref = useRef<any>();
   useFrame((state) => {
@@ -33,6 +42,6 @@ const Electron = ({ radius = 2.75, speed = 6, ...props }: GroupProps & {
       </Trail>
     </group>
   );
-}
+};
 
 export default Electron;

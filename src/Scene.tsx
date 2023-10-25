@@ -12,8 +12,8 @@ const FloatingAtom = () => {
         <Atom />
       </Float>
     </>
-  )
-}
+  );
+};
 
 export default function Scene() {
   return (
