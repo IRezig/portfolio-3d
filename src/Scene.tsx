@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Float, Stars } from '@react-three/drei';
+import { Float, Sphere, Stars } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
@@ -17,8 +17,13 @@ const FloatingAtom = () => {
 
 export default function Scene() {
   return (
-    <Canvas camera={{ position: [40, 0, 40] }}>
+    <Canvas camera={{ position: [0, 0, 20] }}>
       <color attach="background" args={['black']} />
+      <group position={[0, 3, 10]}>
+        <Sphere args={[0.55]}>
+          <meshBasicMaterial color={[6, 0.5, 2]} />
+        </Sphere>
+      </group>
       <FloatingAtom />
       <Stars saturation={0} count={400} speed={0.5} />
       <EffectComposer>
