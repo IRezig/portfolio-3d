@@ -1,14 +1,9 @@
 import { Stars } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
-import { CameraAnimationHandler } from './Camera';
-
 export const SceneSetup = () => {
   return (
     <>
-      {/* Camera handling */}
-      <CameraAnimationHandler />
-
       {/* Background Color */}
       <color
         {...{

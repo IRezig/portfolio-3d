@@ -10,7 +10,7 @@ const Player = () => {
   usePlayerHandler(meshRef);
 
   return (
-    <Float ref={meshRef} speed={20} rotationIntensity={1} floatIntensity={2}>
+    <Float ref={meshRef} speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
       <Atom />
     </Float>
   );

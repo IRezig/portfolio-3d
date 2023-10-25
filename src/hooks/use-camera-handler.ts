@@ -1,39 +1,74 @@
 import { Clock } from 'three';
 
+interface AnimProperties {
+  start: number[];
+  end: number[];
+  clock: Clock;
+  duration: number;
+  callback?: () => void;
+}
+
 let cameraLookAt = [0, 0, 0];
-let cameraAnimDuration = 0;
-let cameraStart: number[] | null = null;
-let cameraEnd: number[] | null = null;
-let cameraAnimClock: Clock | null = null;
+let focused = false;
+let currentAnim: AnimProperties | null = null;
+let previousPosition: number[] | null = null;
 
 export const useCameraHandler = () => {
-  const focusPosition = (duration: number, pos: number[]) => {
-    cameraStart = cameraLookAt;
-    cameraEnd = pos;
-    cameraAnimDuration = duration;
-    cameraAnimClock = new Clock();
+  const isFocused = () => focused;
+
+  const focusObject = (position: number[]) => {
+    focused = true;
+    previousPosition = cameraLookAt;
+    focusPosition(1.2, position);
+    console.log('focusing to', position);
   };
 
-  const runAnimation = () => {
-    if (!cameraStart || !cameraEnd || !cameraAnimClock) {
-      return cameraLookAt;
+  const unfocusObject = () => {
+    if (previousPosition) {
+      console.log('unfocusing to', previousPosition);
+      focusPosition(0.7, previousPosition, () => {
+        focused = false;
+      });
     }
-    const end = cameraEnd;
-    const start = cameraStart;
+  };
+
+  const focusPosition = (duration: number, pos: number[], callback?: () => void) => {
+    currentAnim = {
+      start: cameraLookAt,
+      end: pos,
+      clock: new Clock(),
+      duration,
+      callback,
+    };
+  };
+
+  const syncLook = (pos: number[]) => {
+    cameraLookAt = pos;
+  };
+
+  const runAnimationFrame = () => {
+    if (!currentAnim) {
+      return null;
+    }
+    const { start, end, clock, duration, callback } = currentAnim;
     const diff = end.map((n, index) => n - start[index]);
-    const progress = cameraAnimClock.getElapsedTime() / cameraAnimDuration;
-    cameraLookAt = cameraStart.map((n, index) => n + diff[index] * progress);
+    const progress = clock.getElapsedTime() / duration;
+    cameraLookAt = start.map((n, index) => n + diff[index] * progress);
     if (progress >= 1) {
-      cameraStart = null;
-      cameraEnd = null;
-      cameraAnimClock = null;
+      currentAnim = null;
+      if (callback) {
+        callback();
+      }
     }
 
     return cameraLookAt;
   };
 
   return {
-    focusPosition,
-    runAnimation,
+    focusObject,
+    unfocusObject,
+    runAnimationFrame,
+    isFocused,
+    syncLook,
   };
 };
