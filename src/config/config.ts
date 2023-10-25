@@ -1,4 +1,6 @@
+import { Vector3 } from 'three';
+
 export default {
-  hitBoxMarginMin: 110,
-  hitBoxMarginMax: 400,
+  initialPlayerPosition: new Vector3(0, 0, 20),
+  initialCameraPosition: new Vector3(0, 10, 34),
 };

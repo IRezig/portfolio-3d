@@ -1,7 +1,9 @@
 import { Float, Plane, Sphere } from '@react-three/drei';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Euler, Group } from 'three';
 
+import config from '../config/config';
+import { useSceneContext } from '../context/scene-context';
 import { usePlayerHandler } from '../hooks/use-player-handler';
 import { Atom } from './Atom';
 
@@ -10,21 +12,34 @@ const Player = () => {
   usePlayerHandler(meshRef);
 
   return (
-    <Float ref={meshRef} speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
+    <Float
+      position={config.initialPlayerPosition}
+      ref={meshRef}
+      speed={20}
+      rotationIntensity={0.4}
+      floatIntensity={0.8}
+    >
       <Atom />
     </Float>
   );
 };
 
 const Ball = () => {
+  const ref = useRef<Group>(null);
+  const { exposeObject } = useSceneContext();
+
+  useEffect(() => {
+    exposeObject('ball', ref);
+  }, []);
+
   return (
-    <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
-      <group {...{ position: [0, 3, 10] }}>
-        <Sphere args={[0.55]}>
+    <group ref={ref} {...{ position: [0, 0, -40] }}>
+      <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
+        <Sphere args={[4]}>
           <meshBasicMaterial color={[6, 0.5, 2]} />
         </Sphere>
-      </group>
-    </Float>
+      </Float>
+    </group>
   );
 };
 
@@ -32,7 +47,7 @@ const Ground = () => {
   const groundRotation = new Euler(30, 0, 0);
 
   return (
-    <Plane args={[30, 20]} rotation={groundRotation} position={[0, -20, 0]}>
+    <Plane args={[80, 60]} rotation={groundRotation} position={[0, -20, 0]}>
       <meshBasicMaterial color={[0.3, 0.3, 0.3]} />
     </Plane>
   );
