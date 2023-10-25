@@ -3,10 +3,9 @@ import { Float, Sphere, Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
-import { useFocusCamera } from './hooks/use-focus-camera'
+import { useCameraHandler, useFocusCamera } from './hooks/use-camera-handler';
 import { Atom } from './Atom';
 import { useEffect } from 'react';
-import { Clock } from 'three';
 import { CameraAnimationHandler } from './Camera';
 
 const FloatingAtom = () => {
@@ -19,18 +18,17 @@ const FloatingAtom = () => {
   );
 };
 
-let toggleCamerView = false
+let toggleCamerView = false;
 export default function Scene() {
-
-  const { focusPosition } = useFocusCamera()
+  const { focusPosition } = useCameraHandler();
 
   const onKeyPress = (key: string) => {
     if (key === 'p') {
-      toggleCamerView = !toggleCamerView
+      toggleCamerView = !toggleCamerView;
       if (!toggleCamerView) {
-        focusPosition(0.4, [0, 0, 0])
+        focusPosition(0.4, [0, 0, 0]);
       } else {
-        focusPosition(1.2, [0, 3, 10])
+        focusPosition(1.2, [0, 3, 10]);
       }
     }
   };

@@ -1,13 +1,12 @@
 import { useFrame } from '@react-three/fiber';
 
-import { useFocusCamera } from './hooks/use-focus-camera';
+import { useCameraHandler } from './hooks/use-camera-handler';
 
 export const CameraAnimationHandler = () => {
-  const { runAnimation, cameraLookAt } = useFocusCamera();
+  const { runAnimation } = useCameraHandler();
 
   useFrame(({ camera }) => {
-    runAnimation();
-    const [x, y, z] = cameraLookAt;
+    const [x, y, z] = runAnimation();
     camera.lookAt(x, y, z);
   });
 

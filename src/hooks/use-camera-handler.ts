@@ -6,7 +6,7 @@ let cameraStart: number[] | null = null;
 let cameraEnd: number[] | null = null;
 let cameraAnimClock: Clock | null = null;
 
-export const useFocusCamera = () => {
+export const useCameraHandler = () => {
   const focusPosition = (duration: number, pos: number[]) => {
     cameraStart = cameraLookAt;
     cameraEnd = pos;
@@ -16,7 +16,7 @@ export const useFocusCamera = () => {
 
   const runAnimation = () => {
     if (!cameraStart || !cameraEnd || !cameraAnimClock) {
-      return;
+      return cameraLookAt;
     }
     const end = cameraEnd;
     const start = cameraStart;
@@ -29,10 +29,11 @@ export const useFocusCamera = () => {
       cameraEnd = null;
       cameraAnimClock = null;
     }
+
+    return cameraLookAt;
   };
 
   return {
-    cameraLookAt,
     focusPosition,
     runAnimation,
   };
