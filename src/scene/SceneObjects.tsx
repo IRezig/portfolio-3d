@@ -3,8 +3,10 @@ import { Float, Plane, Sphere } from '@react-three/drei';
 import { Euler } from 'three';
 
 import { Atom } from './Atom';
+import { usePlayerHandler } from '../hooks/use-player-handler';
 
 export const SceneObjects = () => {
+  usePlayerHandler()
   const groundRotation = new Euler(30, 0, 0);
 
   return (
