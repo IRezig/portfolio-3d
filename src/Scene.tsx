@@ -24,14 +24,15 @@ const Cam = () => {
     const [x, y, z] = cameraLookAt;
     camera.lookAt(x, y, z);
   });
-  return (null)
-}
+  return null;
+};
 
 export default function Scene() {
   const onKeyPress = (key: string) => {
     if (key === 'p') {
       const oldY = cameraLookAt[1];
-      cameraLookAt[1] = oldY === 10 ? 0 : 10
+      cameraLookAt[1] = oldY === 3 ? 0 : 3;
+      cameraLookAt[2] = oldY === 3 ? 0 : 10;
     }
   };
 
