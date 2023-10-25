@@ -24,7 +24,6 @@ export const useCameraHandler = () => {
     const progress = cameraAnimClock.getElapsedTime() / cameraAnimDuration;
     cameraLookAt = cameraStart.map((n, index) => n + diff[index] * progress);
     if (progress >= 1) {
-      console.log('Finished!');
       cameraStart = null;
       cameraEnd = null;
       cameraAnimClock = null;

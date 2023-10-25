@@ -36,11 +36,12 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
     }
   });
 
-  useFrame(() => {
-    console.log(directionX, directionZ);
+  useFrame(({ camera }) => {
     if (ref.current) {
       ref.current.position.x += directionX * 1;
       ref.current.position.z += directionZ * 1;
+      camera.position.x += directionX * 1;
+      camera.position.z += directionZ * 1;
     }
   });
 };
