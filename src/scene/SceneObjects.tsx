@@ -7,7 +7,7 @@ import { usePlayerHandler } from '../hooks/use-player-handler';
 import { useRef } from 'react';
 
 const Player = () => {
-  const meshRef = useRef<Group>(null)
+  const meshRef = useRef<Group>(null);
   usePlayerHandler(meshRef);
 
   return (

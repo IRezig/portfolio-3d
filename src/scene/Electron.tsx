@@ -29,7 +29,6 @@ export const Electron = ({
   return (
     <group {...props}>
       <Trail
-        local
         width={5}
         length={6}
         color={new THREE.Color(2, 1, 10)}
