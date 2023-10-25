@@ -1,10 +1,11 @@
 /* eslint-disable */
 import { Float, Sphere, Stars } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 import Atom from './Atom';
 import { useEffect } from 'react';
+import { Camera } from 'three';
 
 const FloatingAtom = () => {
   return (
@@ -16,22 +17,31 @@ const FloatingAtom = () => {
   );
 };
 
-export default function Scene() {
+let cameraLookAt = [0, 0, 0];
 
+const Cam = () => {
+  useFrame(({ camera }) => {
+    const [x, y, z] = cameraLookAt;
+    camera.lookAt(x, y, z);
+  });
+  return (null)
+}
+
+export default function Scene() {
   const onKeyPress = (key: string) => {
     if (key === 'p') {
-      console.log('ok')
+      const oldY = cameraLookAt[1];
+      cameraLookAt[1] = oldY === 10 ? 0 : 10
     }
-  }
+  };
 
   useEffect(() => {
-    document.addEventListener('keydown', (event) => onKeyPress(event.key))
-  }, [])
+    document.addEventListener('keydown', (event) => onKeyPress(event.key));
+  }, []);
 
   return (
-    <Canvas 
-      camera={{ position: [0, 0, 20] }} 
-    >
+    <Canvas camera={{ position: [0, 0, 20] }}>
+      <Cam />
       <color attach="background" args={['black']} />
       <group position={[0, 3, 10]}>
         <Sphere args={[0.55]}>
