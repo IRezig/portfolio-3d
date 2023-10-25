@@ -1,6 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { MutableRefObject } from 'react';
-import { Group, Vector3 } from 'three';
+import { Vector3 } from 'three';
 
 import { useMenuContext } from '../context/menu-context';
 import { useSceneContext } from '../context/scene-context';
@@ -23,9 +22,15 @@ const keys: Record<string, Record<string, number>> = {
   },
 };
 
-export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>) => {
-  const { isFocused, runAnimationFrame, unfocusObject, focusObject, syncLook } =
-    useCameraHandler();
+export const usePlayerHandler = () => {
+  const {
+    isFocused,
+    syncPosition,
+    runAnimationFrame,
+    unfocusObject,
+    focusObject,
+    syncLook,
+  } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
 
@@ -46,12 +51,13 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
     } else {
       if (key === SPACE_KEY) {
         if (menuShown) {
-          const ball = objects.ball;
-          if (ball?.current) {
-            const position = ball.current.position;
-            focusObject(position);
-            showMenu(false);
+          const ball = objects.ball?.current;
+          if (!ball) {
+            return;
           }
+          const position = ball.position;
+          focusObject(position);
+          showMenu(false);
         }
       }
     }
@@ -67,39 +73,39 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
   });
 
   const checkDistanceWithBall = (currentPos: Vector3) => {
-    const ball = objects.ball;
-    if (ball?.current) {
-      const position = ball.current.position;
-      const distWithBall = currentPos.distanceTo(position);
-      if (distWithBall < 20) {
-        showMenu(true);
-      } else {
-        showMenu(false);
-      }
+    const ball = objects.ball?.current;
+    if (!ball) {
+      return;
+    }
+    const position = ball.position;
+    const distWithBall = currentPos.distanceTo(position);
+    if (distWithBall < 20) {
+      showMenu(true);
+    } else {
+      showMenu(false);
     }
   };
 
   useFrame(({ camera }) => {
-    if (ref.current) {
-      if (isFocused()) {
-        // Handle camera focus
-        runAnimationFrame(camera);
-      } else {
-        // Handle player movement
-        ref.current.position.x += directionX * 1;
-        ref.current.position.z += directionZ * 1;
-        camera.position.x += directionX * 1;
-        camera.position.z += directionZ * 1;
-        syncLook(ref.current.position);
-
-        camera.lookAt(
-          ref.current.position.x,
-          ref.current.position.y,
-          ref.current.position.z,
-        );
-
-        checkDistanceWithBall(ref.current.position);
+    if (isFocused()) {
+      // Handle camera focus
+      runAnimationFrame(camera);
+    } else {
+      const player = objects.player?.current;
+      if (!player) {
+        return;
       }
+      // Handle player movement
+      player.position.x += directionX * 1;
+      player.position.z += directionZ * 1;
+      camera.position.x += directionX * 1;
+      camera.position.z += directionZ * 1;
+      syncLook(player.position);
+      syncPosition(camera.position);
+
+      camera.lookAt(player.position.x, player.position.y, player.position.z);
+
+      checkDistanceWithBall(player.position);
     }
   });
 };

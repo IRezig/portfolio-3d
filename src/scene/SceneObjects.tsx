@@ -8,13 +8,18 @@ import { usePlayerHandler } from '../hooks/use-player-handler';
 import { Atom } from './Atom';
 
 const Player = () => {
-  const meshRef = useRef<Group>(null);
-  usePlayerHandler(meshRef);
+  const ref = useRef<Group>(null);
+  const { exposeObject } = useSceneContext();
+  usePlayerHandler();
+
+  useEffect(() => {
+    exposeObject('player', ref);
+  }, []);
 
   return (
     <Float
       position={config.initialPlayerPosition}
-      ref={meshRef}
+      ref={ref}
       speed={20}
       rotationIntensity={0.4}
       floatIntensity={0.8}
