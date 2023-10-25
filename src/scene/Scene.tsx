@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useRef, useState } from 'react';
 
 import config from '../config/config';
 import { ObjectType, SceneContext, SceneContextType } from '../context/scene-context';
@@ -19,10 +19,6 @@ export const Scene = () => {
     updateObjects(key, obj);
 
   const destroyObject = (key: string) => updateObjects(key, undefined);
-
-  useEffect(() => {
-    console.log('mount');
-  }, []);
 
   return (
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
