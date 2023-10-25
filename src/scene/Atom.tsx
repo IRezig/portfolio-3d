@@ -1,17 +1,18 @@
 import { Line, Sphere } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
-import { useMemo } from 'react';
-import * as THREE from 'three';
+import { forwardRef, useMemo } from 'react';
+import { EllipseCurve, Group } from 'three';
 
 import { Electron } from './Electron';
 
-export const Atom = ({ ...props }: GroupProps) => {
+export const Atom = forwardRef<Group>(({ ...props }: GroupProps, ref) => {
   const points = useMemo(
-    () => new THREE.EllipseCurve(0, 0, 3, 1.15, 0, 2 * Math.PI, false, 0).getPoints(100),
+    () => new EllipseCurve(0, 0, 3, 1.15, 0, 2 * Math.PI, false, 0).getPoints(100),
     [],
   );
+
   return (
-    <group {...props}>
+    <group ref={ref} {...props}>
       <Line worldUnits points={points} color="turquoise" lineWidth={0.3} />
       <Line
         worldUnits
@@ -35,4 +36,5 @@ export const Atom = ({ ...props }: GroupProps) => {
       </Sphere>
     </group>
   );
-};
+});
+Atom.displayName = 'Atom';

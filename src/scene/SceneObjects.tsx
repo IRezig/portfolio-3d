@@ -1,19 +1,21 @@
 /* eslint-disable */
 import { Float, Plane, Sphere } from '@react-three/drei';
-import { Euler } from 'three';
+import { Euler, Group } from 'three';
 
 import { Atom } from './Atom';
 import { usePlayerHandler } from '../hooks/use-player-handler';
+import { useRef } from 'react';
 
 const Player = () => {
-  usePlayerHandler();
-  
+  const meshRef = useRef<Group>()
+  usePlayerHandler(meshRef);
+
   return (
-    <Float speed={20} rotationIntensity={1} floatIntensity={2}>
+    <Float ref={meshRef} speed={20} rotationIntensity={1} floatIntensity={2}>
       <Atom />
     </Float>
-  )
-}
+  );
+};
 
 const Ball = () => {
   return (
@@ -24,8 +26,8 @@ const Ball = () => {
         </Sphere>
       </group>
     </Float>
-  )
-}
+  );
+};
 
 const Ground = () => {
   const groundRotation = new Euler(30, 0, 0);
@@ -34,8 +36,8 @@ const Ground = () => {
     <Plane args={[30, 20]} rotation={groundRotation} position={[0, -20, 0]}>
       <meshBasicMaterial color={[0.3, 0.3, 0.3]} />
     </Plane>
-  )
-}
+  );
+};
 
 export const SceneObjects = () => {
   return (

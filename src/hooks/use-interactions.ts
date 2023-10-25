@@ -1,12 +1,12 @@
 import { useCameraHandler } from './use-camera-handler';
-import { useKeyPress } from './use-key-press';
+import { useKeyDown } from './use-key-press';
 
 let toggleCamerView = false;
 
 export const useInteractions = () => {
   const { focusPosition } = useCameraHandler();
 
-  useKeyPress(({ key }) => {
+  useKeyDown(({ key }) => {
     if (key === 'p') {
       toggleCamerView = !toggleCamerView;
       if (!toggleCamerView) {
