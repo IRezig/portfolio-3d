@@ -33,7 +33,7 @@ const Ball = () => {
   }, []);
 
   return (
-    <group ref={ref} {...{ position: [0, 0, -40] }}>
+    <group ref={ref} {...{ position: config.initialBallPosition }}>
       <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
         <Sphere args={[4]}>
           <meshBasicMaterial color={[6, 0.5, 2]} />

@@ -52,8 +52,6 @@ export const usePlayerHandler = (ref: MutableRefObject<Group | undefined | null>
             focusObject(position.toArray());
             showMenu(false);
           }
-        } else {
-          focusObject([0, 3, 10]);
         }
       }
     }
