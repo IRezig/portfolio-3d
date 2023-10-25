@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { Stars } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
@@ -11,7 +10,12 @@ export const SceneSetup = () => {
       <CameraAnimationHandler />
 
       {/* Background Color */}
-      <color attach="background" args={['black']} />
+      <color
+        {...{
+          attach: 'background',
+          args: ['black'],
+        }}
+      />
 
       {/* Background Ambiance */}
       <Stars saturation={0} count={400} speed={0.5} />
