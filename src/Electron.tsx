@@ -1,11 +1,14 @@
 /* eslint-disable */
 import { Trail } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { BoxGeometryProps, GroupProps, SphereGeometryProps, useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
 
-function Electron({ radius = 2.75, speed = 6, ...props }) {
-  const ref = useRef();
+const Electron = ({ radius = 2.75, speed = 6, ...props }: GroupProps & {
+  speed?: number
+  radius?: number
+}) => {
+  const ref = useRef<any>();
   useFrame((state) => {
     const t = state.clock.getElapsedTime() * speed;
     ref.current.position.set(

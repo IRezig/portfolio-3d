@@ -1,10 +1,11 @@
 import { Line, Sphere } from '@react-three/drei';
+import { GroupProps } from '@react-three/fiber';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 
 import Electron from './Electron';
 
-function Atom(props) {
+const Atom = ({ ...props }: GroupProps) => {
   const points = useMemo(
     () => new THREE.EllipseCurve(0, 0, 3, 1.15, 0, 2 * Math.PI, false, 0).getPoints(100),
     [],
@@ -34,6 +35,6 @@ function Atom(props) {
       </Sphere>
     </group>
   );
-}
+};
 
 export default Atom;
