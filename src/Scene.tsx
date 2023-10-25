@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 import Atom from './Atom';
+import { useEffect } from 'react';
 
 const FloatingAtom = () => {
   return (
@@ -16,8 +17,21 @@ const FloatingAtom = () => {
 };
 
 export default function Scene() {
+
+  const onKeyPress = (key: string) => {
+    if (key === 'p') {
+      console.log('ok')
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('keydown', (event) => onKeyPress(event.key))
+  }, [])
+
   return (
-    <Canvas camera={{ position: [0, 0, 20] }}>
+    <Canvas 
+      camera={{ position: [0, 0, 20] }} 
+    >
       <color attach="background" args={['black']} />
       <group position={[0, 3, 10]}>
         <Sphere args={[0.55]}>
