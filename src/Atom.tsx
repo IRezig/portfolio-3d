@@ -3,9 +3,9 @@ import { GroupProps } from '@react-three/fiber';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 
-import Electron from './Electron';
+import { Electron } from './Electron';
 
-const Atom = ({ ...props }: GroupProps) => {
+export const Atom = ({ ...props }: GroupProps) => {
   const points = useMemo(
     () => new THREE.EllipseCurve(0, 0, 3, 1.15, 0, 2 * Math.PI, false, 0).getPoints(100),
     [],
@@ -36,5 +36,3 @@ const Atom = ({ ...props }: GroupProps) => {
     </group>
   );
 };
-
-export default Atom;

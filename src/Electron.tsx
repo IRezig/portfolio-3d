@@ -9,7 +9,7 @@ import {
 import { useRef } from 'react';
 import * as THREE from 'three';
 
-const Electron = ({
+export const Electron = ({
   radius = 2.75,
   speed = 6,
   ...props
@@ -43,5 +43,3 @@ const Electron = ({
     </group>
   );
 };
-
-export default Electron;

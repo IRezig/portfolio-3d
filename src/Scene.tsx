@@ -3,9 +3,11 @@ import { Float, Sphere, Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
-import Atom from './Atom';
+import { useFocusCamera } from './hooks/use-focus-camera'
+import { Atom } from './Atom';
 import { useEffect } from 'react';
-import { Camera } from 'three';
+import { Clock } from 'three';
+import { CameraAnimationHandler } from './Camera';
 
 const FloatingAtom = () => {
   return (
@@ -17,22 +19,19 @@ const FloatingAtom = () => {
   );
 };
 
-let cameraLookAt = [0, 0, 0];
-
-const Cam = () => {
-  useFrame(({ camera }) => {
-    const [x, y, z] = cameraLookAt;
-    camera.lookAt(x, y, z);
-  });
-  return null;
-};
-
+let toggleCamerView = false
 export default function Scene() {
+
+  const { focusPosition } = useFocusCamera()
+
   const onKeyPress = (key: string) => {
     if (key === 'p') {
-      const oldY = cameraLookAt[1];
-      cameraLookAt[1] = oldY === 3 ? 0 : 3;
-      cameraLookAt[2] = oldY === 3 ? 0 : 10;
+      toggleCamerView = !toggleCamerView
+      if (!toggleCamerView) {
+        focusPosition(0.4, [0, 0, 0])
+      } else {
+        focusPosition(1.2, [0, 3, 10])
+      }
     }
   };
 
@@ -42,7 +41,7 @@ export default function Scene() {
 
   return (
     <Canvas camera={{ position: [0, 0, 20] }}>
-      <Cam />
+      <CameraAnimationHandler />
       <color attach="background" args={['black']} />
       <group position={[0, 3, 10]}>
         <Sphere args={[0.55]}>
