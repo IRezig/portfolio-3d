@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
-
 import { useCameraHandler } from './use-camera-handler';
+import { useKeyPress } from './use-key-press';
 
 let toggleCamerView = false;
 
 export const useInteractions = () => {
   const { focusPosition } = useCameraHandler();
 
-  const onKeyPress = (key: string) => {
+  useKeyPress(({ key }) => {
     if (key === 'p') {
       toggleCamerView = !toggleCamerView;
       if (!toggleCamerView) {
@@ -16,9 +15,5 @@ export const useInteractions = () => {
         focusPosition(1.2, [0, 3, 10]);
       }
     }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', (event) => onKeyPress(event.key));
-  }, []);
+  });
 };
