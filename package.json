@@ -1,0 +1,43 @@
+{
+  "name": "vite-reactts-eslint-prettier",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
+    "lint:fix": "eslint ./src --ext .jsx,.js,.ts,.tsx --quiet --fix --ignore-path ./.gitignore",
+    "lint:format": "prettier  --loglevel warn --write \"./**/*.{js,jsx,ts,tsx,css,md,json}\" ",
+    "lint": "yarn lint:format && yarn lint:fix ",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.88.7",
+    "@react-three/fiber": "^8.15.7",
+    "@react-three/postprocessing": "^2.15.8",
+    "@types/three": "^0.157.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.157.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.32",
+    "@types/react-dom": "^18.2.14",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "@vitejs/plugin-react": "^4.1.0",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "pre-commit": "^1.2.2",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0"
+  },
+  "pre-commit": "lint",
+  "license": "MIT"
+}
