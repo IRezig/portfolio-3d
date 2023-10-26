@@ -1,13 +1,12 @@
 /* eslint-disable */
-import { AccumulativeShadows, Float, RandomizedLight, useGLTF } from '@react-three/drei';
+import { Float, useGLTF } from '@react-three/drei';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { AnimationMixer, Group, MeshStandardMaterial, TextureLoader } from 'three';
+import { AnimationMixer, Group, TextureLoader } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
 import { usePlayerHandler } from '../../hooks/use-player-handler';
-import { Atom } from './Atom';
 
 export const Player = () => {
   const ref = useRef<Group>(null);
@@ -50,21 +49,6 @@ export const Player = () => {
           <meshStandardMaterial map={texture} />
         </mesh>
       </Float>
-      {/* <AccumulativeShadows
-        temporal
-        frames={100}
-        scale={10}
-        alphaTest={0.85}
-        position={[0, 0.04, 0]}
-      >
-        <RandomizedLight
-          amount={8}
-          radius={10}
-          ambient={0.5}
-          position={[2.5, 5, -5]}
-          bias={0.001}
-        />
-      </AccumulativeShadows> */}
     </group>
   );
 };
