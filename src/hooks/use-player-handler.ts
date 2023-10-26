@@ -115,9 +115,9 @@ export const usePlayerHandler = () => {
 
       // Keep camera behind the player
       if (orientation.y !== 0) {
-        const offset = forward.clone().multiplyScalar(-config.cameraDistance);
+        const offset = forward.clone().multiplyScalar(-config.camera.distance);
         const camPos = player.position.clone();
-        camPos.y = config.cameraHeight;
+        camPos.y = config.camera.height;
         camera.position.copy(camPos).add(offset);
       }
 

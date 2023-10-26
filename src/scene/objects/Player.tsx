@@ -37,7 +37,7 @@ export const Player = () => {
     <group
       scale={[scale, scale, scale]}
       rotation={[0, Math.PI, 0]}
-      position={config.initialPlayerPosition}
+      position={config.player.initialPosition}
       ref={ref}
     >
       <Float speed={20} rotationIntensity={0.4} floatIntensity={0.8}>

@@ -26,7 +26,7 @@ export const Scene = () => {
 
   return (
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
-      <Canvas camera={{ position: config.initialCameraPosition }}>
+      <Canvas camera={{ position: config.camera.initialPosition }}>
         <Ball />
         <SecondBall />
         <Player />

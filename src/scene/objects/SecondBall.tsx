@@ -15,7 +15,7 @@ export const SecondBall = () => {
   }, []);
 
   return (
-    <group ref={ref} {...{ position: config.initialSecondBallPosition }}>
+    <group ref={ref} {...{ position: config.objects.secondBall.initialPosition }}>
       <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
         <Atom />
       </Float>

@@ -4,10 +4,21 @@ const CAMERA_HEIGHT = 20;
 const CAMERA_DISTANCE = 40;
 
 export default {
-  cameraHeight: CAMERA_HEIGHT,
-  cameraDistance: CAMERA_DISTANCE,
-  initialPlayerPosition: new Vector3(0, 0, 0),
-  initialCameraPosition: new Vector3(0, CAMERA_HEIGHT, CAMERA_DISTANCE),
-  initialBallPosition: new Vector3(0, 4, -40),
-  initialSecondBallPosition: new Vector3(-30, 4, -120),
+  camera: {
+    height: CAMERA_HEIGHT,
+    distance: CAMERA_DISTANCE,
+    initialPosition: new Vector3(0, CAMERA_HEIGHT, CAMERA_DISTANCE),
+  },
+  player: {
+    initialPosition: new Vector3(0, 0, 0),
+  },
+  objects: {
+    ball: {
+      initialPosition: new Vector3(0, 4, -40),
+      zoomFocusOffset: new Vector3(0, 4, 0),
+    },
+    secondBall: {
+      initialPosition: new Vector3(-30, 4, -120),
+    },
+  },
 };
