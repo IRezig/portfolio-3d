@@ -33,19 +33,51 @@ export const useCameraHandler = () => {
   const focusObject = (target: Vector3) => {
     cam.focused = true;
     camBeforeFocus = cam;
-    const playerPos = _getPlayerPos();
-    if (playerPos) {
-      _animateTo(1.2, target, playerPos);
-    }
+    _animateTo(1.2, target, _getPlayerPos());
   };
 
   const unfocusObject = () => {
-    const playerPos = _getPlayerPos();
-    if (camBeforeFocus && playerPos) {
-      _animateTo(0.7, playerPos, camBeforeFocus.pos, () => {
+    if (camBeforeFocus) {
+      _animateTo(0.7, _getPlayerPos(), camBeforeFocus.pos, () => {
         cam.focused = false;
       });
     }
+  };
+
+  const applyLookProgress = (data: FocusAnimData, progress: number, camera: Camera) => {
+    const diff = {
+      x: data.look.end.x - data.look.start.x,
+      y: data.look.end.y - data.look.start.y,
+      z: data.look.end.z - data.look.start.z,
+    };
+    const applyProgress = (n: number, diff: number) => n + diff * progress;
+    cam.look = new Vector3(
+      applyProgress(data.look.start.x, diff.x),
+      applyProgress(data.look.start.y, diff.y),
+      applyProgress(data.look.start.z, diff.z),
+    );
+
+    camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
+  };
+
+  const applyPositionProgress = (
+    data: FocusAnimData,
+    progress: number,
+    camera: Camera,
+  ) => {
+    const diff = {
+      x: data.position.end.x - data.position.start.x,
+      y: data.position.end.y - data.position.start.y,
+      z: data.position.end.z - data.position.start.z,
+    };
+    const applyProgress = (n: number, diff: number) => n + diff * progress;
+    cam.pos = new Vector3(
+      applyProgress(data.position.start.x, diff.x),
+      applyProgress(data.position.start.y, diff.y),
+      applyProgress(data.position.start.z, diff.z),
+    );
+
+    camera.position.set(cam.pos.x, cam.pos.y, cam.pos.z);
   };
 
   const runCameraFrame = (camera: Camera) => {
@@ -53,34 +85,20 @@ export const useCameraHandler = () => {
       // Handle animation
       // ...when it's focused
       run((data, progress) => {
-        const diff = {
-          x: data.look.end.x - data.look.start.x,
-          y: data.look.end.y - data.look.start.y,
-          z: data.look.end.z - data.look.start.z,
-        };
-        const applyProgress = (n: number, diff: number) => n + diff * progress;
-        cam.look = new Vector3(
-          applyProgress(data.look.start.x, diff.x),
-          applyProgress(data.look.start.y, diff.y),
-          applyProgress(data.look.start.z, diff.z),
-        );
-
-        camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
+        applyLookProgress(data, progress, camera);
+        applyPositionProgress(data, progress, camera);
       });
     } else {
       // Sync up camera from other logic
       // ...while it's not focused
       cam.pos = camera.position;
-      const playerPos = _getPlayerPos();
-      if (playerPos) {
-        cam.look = playerPos;
-      }
+      cam.look = _getPlayerPos();
     }
   };
 
   const _getPlayerPos = () => {
     const player = objects.player?.current;
-    return player?.position ?? null;
+    return player?.position ?? new Vector3(0, 0, 0);
   };
 
   const _animateTo = (
