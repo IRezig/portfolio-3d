@@ -31,10 +31,15 @@ export const useCameraHandler = () => {
   /**
    * Focus animation
    */
-  const focusObject = (target: Vector3) => {
+  const focusObject = (targetLook: Vector3) => {
     cam.focused = true;
     camBeforeFocus = { ...cam };
-    _animateTo(1.2, target, _getPlayerPos());
+    const playerPos = _getPlayerPos();
+    playerPos.y = 5;
+    const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
+    const offset = vec.multiplyScalar(-10);
+    const targetPosition = new Vector3().addVectors(playerPos, offset);
+    _animateTo(1.2, targetLook, targetPosition);
   };
 
   const unfocusObject = () => {

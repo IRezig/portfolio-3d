@@ -3,7 +3,10 @@ import { RefObject, useRef, useState } from 'react';
 
 import config from '../config/config';
 import { ObjectType, SceneContext, SceneContextType } from '../context/scene-context';
-import { SceneObjects } from './SceneObjects';
+import { Ball } from './objects/Ball';
+import { Ground } from './objects/Ground';
+import { Player } from './objects/Player';
+import { Text } from './objects/Text';
 import { SceneSetup } from './SceneSetup';
 
 export const Scene = () => {
@@ -23,7 +26,10 @@ export const Scene = () => {
   return (
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
       <Canvas camera={{ position: config.initialCameraPosition }}>
-        <SceneObjects />
+        <Ball />
+        <Player />
+        <Ground />
+        <Text />
         <SceneSetup />
       </Canvas>
     </SceneContext.Provider>
