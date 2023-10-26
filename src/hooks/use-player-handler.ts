@@ -1,9 +1,10 @@
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import { Vector3 } from 'three';
 
 import config from '../config/config';
 import { useMenuContext } from '../context/menu-context';
-import { useSceneContext } from '../context/scene-context';
+import { ObjectType, useSceneContext } from '../context/scene-context';
 import { useCameraHandler } from './use-camera-handler';
 import { useKeyDown, useKeyUp } from './use-key-press';
 
@@ -30,6 +31,19 @@ export const usePlayerHandler = () => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
+  const nearestObject = useRef<{
+    distance?: number;
+    object?: ObjectType;
+  }>({});
+
+  const focusNearestObject = () => {
+    const range = 20;
+    const { distance = range + 1, object } = nearestObject.current;
+    if (object && distance < range) {
+      focusObject(object.position);
+      updateMenuState(false);
+    }
+  };
 
   useKeyDown(({ key }: KeyboardEvent) => {
     // Handle movements
@@ -50,15 +64,7 @@ export const usePlayerHandler = () => {
       }
     } else {
       if (key === SPACE_KEY) {
-        if (menuShown) {
-          const ball = objects.ball?.current;
-          if (!ball) {
-            return;
-          }
-          const position = ball.position;
-          focusObject(position);
-          showMenu(false);
-        }
+        focusNearestObject();
       }
     }
   });
@@ -75,17 +81,37 @@ export const usePlayerHandler = () => {
     }
   });
 
-  const checkDistanceWithBall = (currentPos: Vector3) => {
-    const ball = objects.ball?.current;
-    if (!ball) {
-      return;
-    }
-    const position = ball.position;
-    const distWithBall = currentPos.distanceTo(position);
-    if (distWithBall < 20) {
-      showMenu(true);
-    } else {
+  const updateMenuState = (show: boolean) => {
+    if (menuShown && !show) {
       showMenu(false);
+    } else if (!menuShown && show) {
+      showMenu(true);
+    }
+  };
+
+  const checkDistances = (currentPos: Vector3) => {
+    let minDistance: number | undefined = undefined;
+    let minObject: ObjectType | undefined = undefined;
+    for (const key in objects) {
+      if (key === 'player') {
+        continue;
+      }
+      const object = objects[key]?.current;
+      if (!object) {
+        continue;
+      }
+      const distWithObject = currentPos.distanceTo(object.position);
+      if (minDistance === undefined || distWithObject < minDistance) {
+        minDistance = distWithObject;
+        minObject = object;
+      }
+    }
+    nearestObject.current = {
+      distance: minDistance,
+      object: minObject,
+    };
+    if (nearestObject.current.distance !== undefined) {
+      updateMenuState(nearestObject.current.distance < 20);
     }
   };
 
@@ -121,7 +147,7 @@ export const usePlayerHandler = () => {
         camera.position.copy(camPos).add(offset);
       }
 
-      checkDistanceWithBall(player.position);
+      checkDistances(player.position);
     }
 
     // Handle camera

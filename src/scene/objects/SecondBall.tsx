@@ -11,7 +11,7 @@ export const SecondBall = () => {
   const { exposeObject } = useSceneContext();
 
   useEffect(() => {
-    exposeObject('ball', ref);
+    exposeObject('second_ball', ref);
   }, []);
 
   return (
