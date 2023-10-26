@@ -1,3 +1,4 @@
+import { Environment } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { RefObject, useRef, useState } from 'react';
 
@@ -33,6 +34,7 @@ export const Scene = () => {
         <Ground />
         <Text />
         <SceneSetup />
+        <Environment preset="city" background blur={0.7} />
       </Canvas>
     </SceneContext.Provider>
   );

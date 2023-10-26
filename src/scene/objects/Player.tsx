@@ -43,7 +43,7 @@ export const Player = () => {
       <Float speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
         <mesh>
           <primitive object={scene} />
-          <sphereGeometry args={[10, 32, 32]} />
+          <sphereGeometry args={[1, 32, 32]} />
           <meshBasicMaterial map={texture} />
         </mesh>
       </Float>
