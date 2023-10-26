@@ -7,11 +7,12 @@ export const Ground = () => {
   return (
     <Plane
       receiveShadow
+      castShadow
       args={[1000, 1000]}
       rotation={groundRotation}
       position={[0, 0, 0]}
     >
-      <meshStandardMaterial attach={'material'} color="#888" />
+      <meshPhongMaterial attach={'material'} color="#888" />
     </Plane>
   );
 };

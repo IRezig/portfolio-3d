@@ -1,4 +1,3 @@
-import { Environment } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 import config from '../config/config';
@@ -11,8 +10,6 @@ export const SceneSetup = () => {
   return (
     <>
       {/* Light */}
-      <ambientLight intensity={0.1} />
-
       <directionalLight
         castShadow
         position={[-100, 20, -100]}
@@ -26,6 +23,7 @@ export const SceneSetup = () => {
         shadow-camera-top={400}
         shadow-camera-bottom={-400}
       />
+
       <spotLight
         castShadow
         position={[
@@ -33,14 +31,14 @@ export const SceneSetup = () => {
           20,
           config.objects.ball.initialPosition.z,
         ]}
-        args={['red', 4000, 0, angleToRad(180), 0]}
+        args={['white', 300, 0, angleToRad(90), 1, 1]}
       />
 
       {/* Background Color */}
       <color
         {...{
           attach: 'background',
-          args: ['black'],
+          args: ['rgb(224, 192, 172)'],
         }}
       />
 
@@ -48,7 +46,6 @@ export const SceneSetup = () => {
       <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={1.4} radius={0.4} />
       </EffectComposer>
-      <Environment preset="sunset" background blur={0.7} />
     </>
   );
 };
