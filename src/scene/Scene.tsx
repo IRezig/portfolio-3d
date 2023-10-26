@@ -6,6 +6,7 @@ import { ObjectType, SceneContext, SceneContextType } from '../context/scene-con
 import { Ball } from './objects/Ball';
 import { Ground } from './objects/Ground';
 import { Player } from './objects/Player';
+import { SecondBall } from './objects/SecondBall';
 import { Text } from './objects/Text';
 import { SceneSetup } from './SceneSetup';
 
@@ -27,6 +28,7 @@ export const Scene = () => {
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
       <Canvas camera={{ position: config.initialCameraPosition }}>
         <Ball />
+        <SecondBall />
         <Player />
         <Ground />
         <Text />

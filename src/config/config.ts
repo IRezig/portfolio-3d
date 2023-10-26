@@ -9,4 +9,5 @@ export default {
   initialPlayerPosition: new Vector3(0, 0, 0),
   initialCameraPosition: new Vector3(0, CAMERA_HEIGHT, CAMERA_DISTANCE),
   initialBallPosition: new Vector3(0, 4, -40),
+  initialSecondBallPosition: new Vector3(-30, 4, -120),
 };
