@@ -95,6 +95,6 @@ export const usePlayerHandler = () => {
     }
 
     // Handle camera
-    runCameraFrame(camera);
+    runCameraFrame();
   });
 };

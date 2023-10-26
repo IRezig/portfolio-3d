@@ -1,4 +1,4 @@
-import { Camera } from '@react-three/fiber';
+import { Camera, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 
 import { useSceneContext } from '../context/scene-context';
@@ -24,6 +24,7 @@ const cam = {
 let camBeforeFocus: typeof cam | null = null;
 
 export const useCameraHandler = () => {
+  const { camera } = useThree();
   const { start, run } = useAnimation<FocusAnimData>();
   const { objects } = useSceneContext();
   const isFocused = () => cam.focused;
@@ -52,7 +53,7 @@ export const useCameraHandler = () => {
     }
   };
 
-  const runCameraFrame = (camera: Camera) => {
+  const runCameraFrame = () => {
     if (cam.focused) {
       // Handle animation
       // ...when it's focused
