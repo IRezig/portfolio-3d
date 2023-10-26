@@ -90,8 +90,6 @@ export const usePlayerHandler = () => {
   };
 
   const checkDistances = (currentPos: Vector3) => {
-    let minDistance: number | undefined = undefined;
-    let minObject: ObjectType | undefined = undefined;
     for (const key in objects) {
       if (key === 'player') {
         continue;
@@ -101,15 +99,14 @@ export const usePlayerHandler = () => {
         continue;
       }
       const distWithObject = currentPos.distanceTo(object.position);
-      if (minDistance === undefined || distWithObject < minDistance) {
-        minDistance = distWithObject;
-        minObject = object;
+      const { distance: minimumDistance } = nearestObject.current;
+      if (minimumDistance === undefined || distWithObject < minimumDistance) {
+        nearestObject.current = {
+          distance: distWithObject,
+          object: object,
+        };
       }
     }
-    nearestObject.current = {
-      distance: minDistance,
-      object: minObject,
-    };
     if (nearestObject.current.distance !== undefined) {
       updateMenuState(nearestObject.current.distance < 20);
     }
