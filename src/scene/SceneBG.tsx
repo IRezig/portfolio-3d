@@ -17,7 +17,6 @@ function Bun(props: MeshProps) {
   const { nodes } = useGLTF(
     'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/bunny/model.gltf',
   ) as any;
-  console.log('SceneBG');
 
   return (
     <mesh

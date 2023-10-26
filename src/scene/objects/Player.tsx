@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Float, useGLTF } from '@react-three/drei';
+import { AccumulativeShadows, Float, RandomizedLight, useGLTF } from '@react-three/drei';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { AnimationMixer, Group, TextureLoader } from 'three';
@@ -35,6 +35,7 @@ export const Player = () => {
   const scale = 0.5;
   return (
     <group
+      castShadow
       scale={[scale, scale, scale]}
       rotation={[0, Math.PI, 0]}
       position={config.player.initialPosition}
@@ -47,6 +48,21 @@ export const Player = () => {
           <meshBasicMaterial map={texture} />
         </mesh>
       </Float>
+      <AccumulativeShadows
+        temporal
+        frames={100}
+        scale={10}
+        alphaTest={0.85}
+        position={[0, 0.04, 0]}
+      >
+        <RandomizedLight
+          amount={8}
+          radius={10}
+          ambient={0.5}
+          position={[2.5, 5, -5]}
+          bias={0.001}
+        />
+      </AccumulativeShadows>
     </group>
   );
 };

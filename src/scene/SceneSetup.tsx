@@ -1,9 +1,15 @@
-import { Stars } from '@react-three/drei';
+import { Environment, Stars } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 export const SceneSetup = () => {
   return (
     <>
+      <directionalLight
+        castShadow
+        color={'white'}
+        position={[10, 10, -40]}
+        intensity={10}
+      />
       {/* Background Color */}
       <color
         {...{
@@ -19,6 +25,7 @@ export const SceneSetup = () => {
       <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={1.4} radius={0.4} />
       </EffectComposer>
+      <Environment preset="city" background blur={0.7} />
     </>
   );
 };

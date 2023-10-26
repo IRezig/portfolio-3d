@@ -33,6 +33,7 @@ module.exports = {
   ],
   plugins: ['simple-import-sort', 'prettier', 'unused-imports'],
   rules: {
+    'react/no-unknown-property': 'off',
     'prettier/prettier': ['error', {}, { usePrettierrc: true }],
     'react/react-in-jsx-scope': 'off',
     'jsx-a11y/accessible-emoji': 'off',

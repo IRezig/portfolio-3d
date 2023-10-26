@@ -1,4 +1,3 @@
-import { Environment } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { RefObject, useRef, useState } from 'react';
 
@@ -27,14 +26,13 @@ export const Scene = () => {
 
   return (
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
-      <Canvas camera={{ position: config.camera.initialPosition }}>
+      <Canvas shadows camera={{ position: config.camera.initialPosition }}>
+        <SceneSetup />
         <Ball />
         <SecondBall />
         <Player />
         <Ground />
         <Text />
-        <SceneSetup />
-        <Environment preset="city" background blur={0.7} />
       </Canvas>
     </SceneContext.Provider>
   );

@@ -117,7 +117,6 @@ export const usePlayerHandler = () => {
     nearestObject.current = check;
     const { distance = DISTANCE_RANGE + 1 } = nearestObject.current;
     updateMenuState(distance < DISTANCE_RANGE);
-    console.log(distance < DISTANCE_RANGE);
   };
 
   const turn = (degrees: number) => {
