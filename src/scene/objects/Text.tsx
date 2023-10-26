@@ -2,7 +2,6 @@
 
 import { extend, useLoader } from '@react-three/fiber';
 import { useEffect, useState } from 'react';
-import { FileLoader } from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
