@@ -17,8 +17,6 @@ interface NearestObject {
 const SPACE_KEY = ' ';
 const orientation = new Vector3(0, 0, 0);
 const DISTANCE_RANGE = 20;
-const walkingKeys = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'];
-
 const keys: Record<string, Record<string, number>> = {
   /*xAxis: {
     ArrowRight: 1,
@@ -33,6 +31,9 @@ const keys: Record<string, Record<string, number>> = {
     ArrowLeft: 1,
   },
 };
+const walkingKeys = Object.keys(keys).reduce((acc: string[], axis) => {
+  return acc.concat(Object.keys(keys[axis]));
+}, []);
 
 export const usePlayerHandler = () => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
@@ -40,8 +41,8 @@ export const usePlayerHandler = () => {
   const { shown: menuShown, showMenu } = useMenuContext();
   const isPlaying = useRef(false);
   const nearestObject = useRef<NearestObject>({});
-  const fbx = useLoader(FBXLoader, './public/walking.fbx');
-  const mixer = useRef<AnimationMixer | null>(null);
+  const fbx = useLoader(FBXLoader, './src/assets/walking.fbx');
+  const mixer = useRef<AnimationMixer | null>(new AnimationMixer(fbx));
 
   const focusNearestObject = () => {
     const { distance = DISTANCE_RANGE + 1, object } = nearestObject.current;
@@ -52,11 +53,9 @@ export const usePlayerHandler = () => {
   };
 
   useKeyDown(({ key }: KeyboardEvent) => {
-    mixer.current = new AnimationMixer(fbx);
-    const action = mixer.current.clipAction(fbx.animations[0]);
-
     // Handle movements
-    if (!isPlaying.current && walkingKeys.includes(key)) {
+    if (mixer.current && !isPlaying.current && walkingKeys.includes(key)) {
+      const action = mixer.current.clipAction(fbx.animations[0]);
       action.play();
       isPlaying.current = true;
     }
