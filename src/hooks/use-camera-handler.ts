@@ -1,9 +1,10 @@
 import { Camera } from '@react-three/fiber';
-import { Clock, Vector3 } from 'three';
+import { Vector3 } from 'three';
 
 import { useSceneContext } from '../context/scene-context';
+import { useAnimation } from './use-animation';
 
-interface AnimProperties {
+interface FocusAnimData {
   look: {
     start: Vector3;
     end: Vector3;
@@ -12,9 +13,6 @@ interface AnimProperties {
     start: Vector3;
     end: Vector3;
   };
-  clock: Clock;
-  duration: number;
-  callback?: () => void;
 }
 
 const cam = {
@@ -23,9 +21,9 @@ const cam = {
   focused: false,
 };
 let camBeforeFocus: typeof cam | null = null;
-let focusAnim: AnimProperties | null = null;
 
 export const useCameraHandler = () => {
+  const { start, run } = useAnimation<FocusAnimData>();
   const { objects } = useSceneContext();
   const isFocused = () => cam.focused;
 
@@ -42,38 +40,39 @@ export const useCameraHandler = () => {
     camBeforeFocus = cam;
     const playerPos = getPlayerPos();
     if (playerPos) {
-      focusPosition(1.2, target, playerPos);
+      _animateTo(1.2, target, playerPos);
     }
   };
 
   const unfocusObject = () => {
     const playerPos = getPlayerPos();
     if (camBeforeFocus && playerPos) {
-      focusPosition(0.7, playerPos, camBeforeFocus.pos, () => {
+      _animateTo(0.7, playerPos, camBeforeFocus.pos, () => {
         cam.focused = false;
       });
     }
   };
 
-  const focusPosition = (
+  const _animateTo = (
     duration: number,
     look: Vector3,
     pos: Vector3,
     callback?: () => void,
   ) => {
-    focusAnim = {
-      look: {
-        start: cam.look,
-        end: look,
+    start(
+      {
+        look: {
+          start: cam.look,
+          end: look,
+        },
+        position: {
+          start: cam.pos,
+          end: pos,
+        },
       },
-      position: {
-        start: cam.pos,
-        end: pos,
-      },
-      clock: new Clock(),
       duration,
       callback,
-    };
+    );
   };
 
   const syncLook = (look: Vector3) => {
@@ -84,31 +83,21 @@ export const useCameraHandler = () => {
   };
 
   const runAnimationFrame = (camera: Camera) => {
-    if (!focusAnim) {
-      return null;
-    }
-    const { look, clock, duration, callback } = focusAnim;
-    const diff = {
-      x: look.end.x - look.start.x,
-      y: look.end.y - look.start.y,
-      z: look.end.z - look.start.z,
-    };
-    const progress = clock.getElapsedTime() / duration;
-    const calcLook = (n: number, diff: number) => n + diff * progress;
-    cam.look = new Vector3(
-      calcLook(look.start.x, diff.x),
-      calcLook(look.start.y, diff.y),
-      calcLook(look.start.z, diff.z),
-    );
+    run((data, progress) => {
+      const diff = {
+        x: data.look.end.x - data.look.start.x,
+        y: data.look.end.y - data.look.start.y,
+        z: data.look.end.z - data.look.start.z,
+      };
+      const applyProgress = (n: number, diff: number) => n + diff * progress;
+      cam.look = new Vector3(
+        applyProgress(data.look.start.x, diff.x),
+        applyProgress(data.look.start.y, diff.y),
+        applyProgress(data.look.start.z, diff.z),
+      );
 
-    if (progress <= 1) {
       camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
-    } else {
-      focusAnim = null;
-      if (callback) {
-        callback();
-      }
-    }
+    });
   };
 
   return {
