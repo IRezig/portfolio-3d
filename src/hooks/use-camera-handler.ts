@@ -66,6 +66,7 @@ export const useCameraHandler = () => {
       // ...while it's not focused
       cam.pos = camera.position.clone();
       cam.look = _getPlayerPos();
+      camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
     }
   };
 
@@ -88,7 +89,7 @@ export const useCameraHandler = () => {
 
   const _getPlayerPos = () => {
     const player = objects.player?.current;
-    return player?.position ?? new Vector3(0, 0, 0);
+    return player?.position.clone() ?? new Vector3(0, 0, 0);
   };
 
   const _animateTo = (
