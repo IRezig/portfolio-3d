@@ -10,7 +10,7 @@ extend({ TextGeometry });
 export const Text = () => {
   const font = useLoader(FontLoader, './src/Roboto-Bold.json');
   const [_, setFontLoaded] = useState(false);
-  const toggle = useRef(false)
+  const toggle = useRef(false);
 
   useEffect(() => {
     toggle.current = !toggle.current;
