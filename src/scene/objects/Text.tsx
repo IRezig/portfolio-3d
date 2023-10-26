@@ -8,7 +8,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 extend({ TextGeometry });
 
 export const Text = () => {
-  const font = useLoader(FontLoader, './src/Roboto-Bold.json');
+  const font = useLoader(FontLoader, './src/assets/Roboto-Bold.json');
   const [_, setFontLoaded] = useState(false);
   const toggle = useRef(false);
 

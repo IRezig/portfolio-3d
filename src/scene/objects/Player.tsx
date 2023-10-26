@@ -18,7 +18,7 @@ export const Player = () => {
     exposeObject('player', ref);
   }, []);
 
-  const { scene, animations } = useGLTF('./src/character.gtlf');
+  const { scene, animations } = useGLTF('./src/assets/character.gtlf');
   const mixer = useRef<AnimationMixer | null>(null);
 
   useFrame((state, delta) => {
@@ -30,7 +30,7 @@ export const Player = () => {
     const action = mixer.current.clipAction(animations[0]);
     action.play();*/
   }, [animations, scene]);
-  const texture = useLoader(TextureLoader, './src/Texture.png'); // replace with the actual file path
+  const texture = useLoader(TextureLoader, './src/assets/Texture.png'); // replace with the actual file path
 
   const scale = 0.5;
   return (
