@@ -88,6 +88,7 @@ export const usePlayerHandler = () => {
       }
       player.position.x += directionX * 1;
       player.position.z += directionZ * 1;
+      console.log(player.position.y);
       camera.position.x += directionX * 1;
       camera.position.z += directionZ * 1;
 

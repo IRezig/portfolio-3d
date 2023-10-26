@@ -35,11 +35,12 @@ export const useCameraHandler = () => {
     cam.focused = true;
     camBeforeFocus = { ...cam };
     const playerPos = _getPlayerPos();
-    playerPos.y = 5;
     const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
-    const offset = vec.multiplyScalar(-10);
+    const offset = vec.multiplyScalar(-20);
     const targetPosition = new Vector3().addVectors(playerPos, offset);
-    _animateTo(1.2, targetLook, targetPosition);
+    const upwardOffset = new Vector3(0, 14, 0);
+    const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
+    _animateTo(1.2, targetLook, finalPosition);
   };
 
   const unfocusObject = () => {

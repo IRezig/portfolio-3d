@@ -31,19 +31,15 @@ export const Player = () => {
     action.play();*/
   }, [animations, scene]);
 
-  const scale = 0.5
+  const scale = 0.5;
   return (
     <group
-      scale={[scale, scale, scale]} 
+      scale={[scale, scale, scale]}
       rotation={[0, Math.PI, 0]}
       position={config.initialPlayerPosition}
       ref={ref}
-      >
-      <Float
-        speed={20}
-        rotationIntensity={0.4}
-        floatIntensity={0.8}
-        >
+    >
+      <Float speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
         <primitive object={scene} />
       </Float>
     </group>
