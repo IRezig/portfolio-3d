@@ -2,7 +2,7 @@
 import { AccumulativeShadows, Float, RandomizedLight, useGLTF } from '@react-three/drei';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { AnimationMixer, Group, TextureLoader } from 'three';
+import { AnimationMixer, Group, MeshStandardMaterial, TextureLoader } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
@@ -35,20 +35,22 @@ export const Player = () => {
   const scale = 0.5;
   return (
     <group
-      castShadow
       scale={[scale, scale, scale]}
       rotation={[0, Math.PI, 0]}
       position={config.player.initialPosition}
       ref={ref}
     >
       <Float speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
-        <mesh>
-          <primitive object={scene} />
+        <mesh castShadow receiveShadow>
+          <primitive castShadow receiveShadow object={scene} />
+          <meshStandardMaterial map={texture} />
+        </mesh>
+        <mesh castShadow receiveShadow>
           <sphereGeometry args={[1, 32, 32]} />
-          <meshBasicMaterial map={texture} />
+          <meshStandardMaterial map={texture} />
         </mesh>
       </Float>
-      <AccumulativeShadows
+      {/* <AccumulativeShadows
         temporal
         frames={100}
         scale={10}
@@ -62,7 +64,7 @@ export const Player = () => {
           position={[2.5, 5, -5]}
           bias={0.001}
         />
-      </AccumulativeShadows>
+      </AccumulativeShadows> */}
     </group>
   );
 };

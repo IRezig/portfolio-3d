@@ -13,8 +13,17 @@ export const Atom = forwardRef<Group>(({ ...props }: GroupProps, ref) => {
 
   return (
     <group ref={ref} {...props}>
-      <Line worldUnits points={points} color="turquoise" lineWidth={0.3} />
       <Line
+        receiveShadow
+        castShadow
+        worldUnits
+        points={points}
+        color="turquoise"
+        lineWidth={0.3}
+      />
+      <Line
+        receiveShadow
+        castShadow
         worldUnits
         points={points}
         color="turquoise"
@@ -22,6 +31,8 @@ export const Atom = forwardRef<Group>(({ ...props }: GroupProps, ref) => {
         rotation={[0, 0, 1]}
       />
       <Line
+        receiveShadow
+        castShadow
         worldUnits
         points={points}
         color="turquoise"
