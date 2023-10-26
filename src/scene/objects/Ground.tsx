@@ -7,7 +7,6 @@ export const Ground = () => {
   return (
     <Plane
       receiveShadow
-      castShadow
       args={[1000, 1000]}
       rotation={groundRotation}
       position={[0, 0, 0]}

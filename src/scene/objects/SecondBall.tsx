@@ -15,12 +15,7 @@ export const SecondBall = () => {
   }, []);
 
   return (
-    <group
-      receiveShadow
-      castShadow
-      ref={ref}
-      {...{ position: config.objects.secondBall.initialPosition }}
-    >
+    <group ref={ref} {...{ position: config.objects.secondBall.initialPosition }}>
       <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
         <Atom />
       </Float>

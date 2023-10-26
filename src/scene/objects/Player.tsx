@@ -41,11 +41,11 @@ export const Player = () => {
       ref={ref}
     >
       <Float speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
-        <mesh castShadow receiveShadow>
-          <primitive castShadow receiveShadow object={scene} />
+        <mesh castShadow>
+          <primitive object={scene} />
           <meshStandardMaterial map={texture} />
         </mesh>
-        <mesh castShadow receiveShadow>
+        <mesh castShadow>
           <sphereGeometry args={[1, 32, 32]} />
           <meshStandardMaterial map={texture} />
         </mesh>

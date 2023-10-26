@@ -18,7 +18,7 @@ export const Text = () => {
   }, [font]);
 
   return (
-    <mesh castShadow receiveShadow {...{ position: [30, 5, -120] }}>
+    <mesh castShadow {...{ position: [30, 5, -120] }}>
       <textGeometry args={['test', { font, size: 4, height: 3 }]} />
       <meshLambertMaterial attach="material" color={'gold'} />
     </mesh>
