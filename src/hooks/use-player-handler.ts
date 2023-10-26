@@ -41,7 +41,7 @@ export const usePlayerHandler = () => {
   const { shown: menuShown, showMenu } = useMenuContext();
   const isPlaying = useRef(false);
   const nearestObject = useRef<NearestObject>({});
-  const fbx = useLoader(FBXLoader, './public/walking.fbx');
+  const fbx = useLoader(FBXLoader, './src/assets/walking.fbx');
   const mixer = useRef<AnimationMixer | null>(new AnimationMixer(fbx));
 
   const focusNearestObject = () => {
