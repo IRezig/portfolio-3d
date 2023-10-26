@@ -14,7 +14,7 @@ export const SceneSetup = () => {
         castShadow
         position={[-100, 20, -100]}
         color="white"
-        intensity={10}
+        intensity={1}
         shadow-mapSize-width={10000}
         shadow-mapSize-height={10000}
         shadow-camera-far={400}
@@ -26,12 +26,14 @@ export const SceneSetup = () => {
 
       <spotLight
         castShadow
+        intensity={240}
+        args={['white', 1, 100]}
+        angle={angleToRad(45)}
         position={[
           config.objects.ball.initialPosition.x,
-          20,
+          10,
           config.objects.ball.initialPosition.z,
         ]}
-        args={['white', 300, 0, angleToRad(90), 1, 1]}
       />
 
       {/* Background Color */}
