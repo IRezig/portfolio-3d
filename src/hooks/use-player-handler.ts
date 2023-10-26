@@ -1,6 +1,7 @@
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Vector3 } from 'three';
+import { AnimationMixer, Vector3 } from 'three';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 import config from '../config/config';
 import { useMenuContext } from '../context/menu-context';
@@ -14,8 +15,9 @@ interface NearestObject {
 }
 
 const SPACE_KEY = ' ';
-
 const orientation = new Vector3(0, 0, 0);
+const DISTANCE_RANGE = 20;
+const walkingKeys = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'];
 
 const keys: Record<string, Record<string, number>> = {
   /*xAxis: {
@@ -32,13 +34,14 @@ const keys: Record<string, Record<string, number>> = {
   },
 };
 
-const DISTANCE_RANGE = 20;
-
 export const usePlayerHandler = () => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
+  const isPlaying = useRef(false);
   const nearestObject = useRef<NearestObject>({});
+  const fbx = useLoader(FBXLoader, './public/walking.fbx');
+  const mixer = useRef<AnimationMixer | null>(null);
 
   const focusNearestObject = () => {
     const { distance = DISTANCE_RANGE + 1, object } = nearestObject.current;
@@ -49,7 +52,14 @@ export const usePlayerHandler = () => {
   };
 
   useKeyDown(({ key }: KeyboardEvent) => {
+    mixer.current = new AnimationMixer(fbx);
+    const action = mixer.current.clipAction(fbx.animations[0]);
+
     // Handle movements
+    if (!isPlaying.current && walkingKeys.includes(key)) {
+      action.play();
+      isPlaying.current = true;
+    }
     if (keys.xAxis?.[key]) {
       orientation.x = keys.xAxis[key];
     }
@@ -73,6 +83,10 @@ export const usePlayerHandler = () => {
   });
 
   useKeyUp(({ key }: KeyboardEvent) => {
+    if (isPlaying.current) {
+      mixer.current?.stopAllAction();
+      isPlaying.current = false;
+    }
     if (keys.xAxis?.[key]) {
       orientation.x = 0;
     }
@@ -127,7 +141,9 @@ export const usePlayerHandler = () => {
     return new Vector3(Math.sin(rotation), 0, Math.cos(rotation));
   };
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera }, delta) => {
+    mixer.current?.update(delta);
+
     // Handle player movement
     if (!isFocused()) {
       const player = objects.player?.current;
@@ -157,4 +173,6 @@ export const usePlayerHandler = () => {
     // Handle camera
     runCameraFrame();
   });
+
+  return fbx;
 };

@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
-import { RefObject, useRef, useState } from 'react';
+import { RefObject, Suspense, useRef, useState } from 'react';
 
+import { Loader } from '../components/Loader';
 import config from '../config/config';
 import { ObjectType, SceneContext, SceneContextType } from '../context/scene-context';
 import { Ball } from './objects/Ball';
@@ -27,12 +28,14 @@ export const Scene = () => {
   return (
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
       <Canvas shadows camera={{ position: config.camera.initialPosition }}>
-        <SceneSetup />
-        <Ball />
-        <SecondBall />
-        <Player />
-        <Ground />
-        <Text />
+        <Suspense fallback={<Loader />}>
+          <SceneSetup />
+          <Ball />
+          <SecondBall />
+          <Player />
+          <Ground />
+          <Text />
+        </Suspense>
       </Canvas>
     </SceneContext.Provider>
   );
