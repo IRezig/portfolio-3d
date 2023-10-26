@@ -39,7 +39,7 @@ export const useCameraHandler = () => {
     const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
     const offset = vec.multiplyScalar(-20);
     const targetPosition = new Vector3().addVectors(playerPos, offset);
-    const upwardOffset = new Vector3(0, 14, 0);
+    const upwardOffset = new Vector3(14, 14, 0);
     const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
     _animateTo(1.2, targetLook, finalPosition);
   };
