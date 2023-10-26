@@ -1,4 +1,5 @@
-import { Stars } from '@react-three/drei';
+import { Environment } from '@react-three/drei';
+import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 export const SceneSetup = () => {
   return (
@@ -26,14 +27,11 @@ export const SceneSetup = () => {
         }}
       />
 
-      {/* Background Ambiance */}
-      <Stars saturation={0} count={400} speed={0.5} />
-
       {/* Post-processing effects */}
-      {/* <EffectComposer>
+      <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={1.4} radius={0.4} />
       </EffectComposer>
-      <Environment preset="city" background blur={0.7} /> */}
+      <Environment preset="sunset" background blur={0.7} />
     </>
   );
 };
