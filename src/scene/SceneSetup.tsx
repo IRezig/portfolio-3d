@@ -23,6 +23,7 @@ export const SceneSetup = () => {
         shadow-camera-top={400}
         shadow-camera-bottom={-400}
       />
+      <hemisphereLight />
 
       <spotLight
         castShadow

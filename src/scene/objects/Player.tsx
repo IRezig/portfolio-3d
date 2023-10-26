@@ -23,9 +23,11 @@ export const Player = () => {
       position={config.player.initialPosition}
       ref={ref}
     >
-      <primitive object={fbx} />
       <mesh castShadow>
         <primitive object={fbx} />
+      </mesh>
+      <mesh castShadow position={[0, 14, 0]}>
+        <sphereGeometry args={[6, 32, 32]} />
       </mesh>
     </group>
   );
