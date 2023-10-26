@@ -17,7 +17,7 @@ export const Text = () => {
   }, [font]);
 
   return (
-    <mesh {...{ position: [0, 1, 0] }}>
+    <mesh {...{ position: [-5, 5, -40] }}>
       <textGeometry args={['test', { font, size: 4, height: 3 }]} />
       <meshBasicMaterial attach="material" color={'gold'} />
     </mesh>
