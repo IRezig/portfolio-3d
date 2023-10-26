@@ -8,6 +8,11 @@ import { ObjectType, useSceneContext } from '../context/scene-context';
 import { useCameraHandler } from './use-camera-handler';
 import { useKeyDown, useKeyUp } from './use-key-press';
 
+interface NearestObject {
+  distance?: number;
+  object?: ObjectType;
+}
+
 const SPACE_KEY = ' ';
 
 const orientation = new Vector3(0, 0, 0);
@@ -27,19 +32,17 @@ const keys: Record<string, Record<string, number>> = {
   },
 };
 
+const DISTANCE_RANGE = 20;
+
 export const usePlayerHandler = () => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
-  const nearestObject = useRef<{
-    distance?: number;
-    object?: ObjectType;
-  }>({});
+  const nearestObject = useRef<NearestObject>({});
 
   const focusNearestObject = () => {
-    const range = 20;
-    const { distance = range + 1, object } = nearestObject.current;
-    if (object && distance < range) {
+    const { distance = DISTANCE_RANGE + 1, object } = nearestObject.current;
+    if (object && distance < DISTANCE_RANGE) {
       focusObject(object.position);
       updateMenuState(false);
     }
@@ -90,6 +93,10 @@ export const usePlayerHandler = () => {
   };
 
   const checkDistances = (currentPos: Vector3) => {
+    let check: NearestObject = {
+      distance: undefined,
+      object: undefined,
+    };
     for (const key in objects) {
       if (key === 'player') {
         continue;
@@ -98,18 +105,19 @@ export const usePlayerHandler = () => {
       if (!object) {
         continue;
       }
-      const distWithObject = currentPos.distanceTo(object.position);
-      const { distance: minimumDistance } = nearestObject.current;
-      if (minimumDistance === undefined || distWithObject < minimumDistance) {
-        nearestObject.current = {
-          distance: distWithObject,
+      const distance = currentPos.distanceTo(object.position);
+      const { distance: minDistance } = check;
+      if (minDistance === undefined || distance < minDistance) {
+        check = {
+          distance,
           object: object,
         };
       }
     }
-    if (nearestObject.current.distance !== undefined) {
-      updateMenuState(nearestObject.current.distance < 20);
-    }
+    nearestObject.current = check;
+    const { distance = DISTANCE_RANGE + 1 } = nearestObject.current;
+    updateMenuState(distance < DISTANCE_RANGE);
+    console.log(distance < DISTANCE_RANGE);
   };
 
   const turn = (degrees: number) => {
