@@ -17,7 +17,7 @@ export const SceneSetup = () => {
 
       {/* Post-processing effects */}
       <EffectComposer>
-        <Bloom mipmapBlur luminanceThreshold={1} radius={0.7} />
+        <Bloom mipmapBlur luminanceThreshold={1.4} radius={0.4} />
       </EffectComposer>
     </>
   );
