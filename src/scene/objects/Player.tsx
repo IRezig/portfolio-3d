@@ -1,8 +1,8 @@
 /* eslint-disable */
 import { Float, useGLTF } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { AnimationMixer, Group } from 'three';
+import { AnimationMixer, Group, TextureLoader } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
@@ -30,6 +30,7 @@ export const Player = () => {
     const action = mixer.current.clipAction(animations[0]);
     action.play();*/
   }, [animations, scene]);
+  const texture = useLoader(TextureLoader, './src/Texture.png'); // replace with the actual file path
 
   const scale = 0.5;
   return (
@@ -40,7 +41,11 @@ export const Player = () => {
       ref={ref}
     >
       <Float speed={20} rotationIntensity={0.4} floatIntensity={0.8}>
-        <primitive object={scene} />
+        <mesh>
+          <primitive object={scene} />
+          <sphereGeometry args={[10, 32, 32]} />
+          <meshBasicMaterial map={texture} />
+        </mesh>
       </Float>
     </group>
   );
