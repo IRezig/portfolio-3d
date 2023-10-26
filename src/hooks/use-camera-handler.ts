@@ -46,27 +46,13 @@ export const useCameraHandler = () => {
     }
   };
 
-  const applyLook = (data: FocusAnimData, progress: number, camera: Camera) => {
-    const diff = diffVectors(data.look.end, data.look.start);
-    const applyProgress = (n: number, d: number) => n + d * progress;
-    cam.look = mergeVectors(data.look.start, diff, applyProgress);
-    camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
-  };
-
-  const applyPosition = (data: FocusAnimData, progress: number, camera: Camera) => {
-    const diff = diffVectors(data.position.end, data.position.start);
-    const applyProgress = (n: number, d: number) => n + d * progress;
-    cam.pos = mergeVectors(data.position.start, diff, applyProgress);
-    camera.position.set(cam.pos.x, cam.pos.y, cam.pos.z);
-  };
-
   const runCameraFrame = (camera: Camera) => {
     if (cam.focused) {
       // Handle animation
       // ...when it's focused
       run((data, progress) => {
-        applyLook(data, progress, camera);
-        applyPosition(data, progress, camera);
+        _applyLook(data, progress, camera);
+        _applyPosition(data, progress, camera);
       });
     } else {
       // Sync up camera from other logic
@@ -74,6 +60,23 @@ export const useCameraHandler = () => {
       cam.pos = camera.position.clone();
       cam.look = _getPlayerPos();
     }
+  };
+
+  /**
+   * Animation helpers
+   */
+  const _applyLook = (data: FocusAnimData, progress: number, camera: Camera) => {
+    const diff = diffVectors(data.look.end, data.look.start);
+    const applyProgress = (n: number, d: number) => n + d * progress;
+    cam.look = mergeVectors(data.look.start, diff, applyProgress);
+    camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
+  };
+
+  const _applyPosition = (data: FocusAnimData, progress: number, camera: Camera) => {
+    const diff = diffVectors(data.position.end, data.position.start);
+    const applyProgress = (n: number, d: number) => n + d * progress;
+    cam.pos = mergeVectors(data.position.start, diff, applyProgress);
+    camera.position.set(cam.pos.x, cam.pos.y, cam.pos.z);
   };
 
   const _getPlayerPos = () => {
