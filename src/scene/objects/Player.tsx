@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Group } from 'three';
+import { Group, Mesh } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
@@ -11,7 +11,14 @@ export const Player = () => {
   const scale = 0.1;
 
   const fbx = usePlayerHandler();
-
+  if (fbx) {
+    fbx.castShadow = true;
+    fbx.traverse((children) => {
+      if (children instanceof Mesh) {
+        children.castShadow = true;
+      }
+    });
+  }
   useEffect(() => {
     exposeObject('player', ref);
   }, []);
@@ -23,9 +30,7 @@ export const Player = () => {
       position={config.player.initialPosition}
       ref={ref}
     >
-      <mesh castShadow>
-        <primitive object={fbx} />
-      </mesh>
+      <primitive object={fbx} dispose={null} />
       <mesh castShadow position={[0, 14, 0]}>
         <sphereGeometry args={[6, 32, 32]} />
       </mesh>
