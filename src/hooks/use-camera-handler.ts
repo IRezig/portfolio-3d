@@ -2,6 +2,7 @@ import { Camera } from '@react-three/fiber';
 import { Vector3 } from 'three';
 
 import { useSceneContext } from '../context/scene-context';
+import { diffVectors, mergeVectors } from '../services/vector-helpers';
 import { useAnimation } from './use-animation';
 
 interface FocusAnimData {
@@ -32,51 +33,30 @@ export const useCameraHandler = () => {
    */
   const focusObject = (target: Vector3) => {
     cam.focused = true;
-    camBeforeFocus = cam;
+    camBeforeFocus = { ...cam };
     _animateTo(1.2, target, _getPlayerPos());
   };
 
   const unfocusObject = () => {
     if (camBeforeFocus) {
-      _animateTo(0.7, _getPlayerPos(), camBeforeFocus.pos, () => {
+      _animateTo(0.7, camBeforeFocus.look, camBeforeFocus.pos, () => {
         cam.focused = false;
       });
+      camBeforeFocus = null;
     }
   };
 
-  const applyLookProgress = (data: FocusAnimData, progress: number, camera: Camera) => {
-    const diff = {
-      x: data.look.end.x - data.look.start.x,
-      y: data.look.end.y - data.look.start.y,
-      z: data.look.end.z - data.look.start.z,
-    };
-    const applyProgress = (n: number, diff: number) => n + diff * progress;
-    cam.look = new Vector3(
-      applyProgress(data.look.start.x, diff.x),
-      applyProgress(data.look.start.y, diff.y),
-      applyProgress(data.look.start.z, diff.z),
-    );
-
+  const applyLook = (data: FocusAnimData, progress: number, camera: Camera) => {
+    const diff = diffVectors(data.look.end, data.look.start);
+    const applyProgress = (n: number, d: number) => n + d * progress;
+    cam.look = mergeVectors(data.look.start, diff, applyProgress);
     camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
   };
 
-  const applyPositionProgress = (
-    data: FocusAnimData,
-    progress: number,
-    camera: Camera,
-  ) => {
-    const diff = {
-      x: data.position.end.x - data.position.start.x,
-      y: data.position.end.y - data.position.start.y,
-      z: data.position.end.z - data.position.start.z,
-    };
-    const applyProgress = (n: number, diff: number) => n + diff * progress;
-    cam.pos = new Vector3(
-      applyProgress(data.position.start.x, diff.x),
-      applyProgress(data.position.start.y, diff.y),
-      applyProgress(data.position.start.z, diff.z),
-    );
-
+  const applyPosition = (data: FocusAnimData, progress: number, camera: Camera) => {
+    const diff = diffVectors(data.position.end, data.position.start);
+    const applyProgress = (n: number, d: number) => n + d * progress;
+    cam.pos = mergeVectors(data.position.start, diff, applyProgress);
     camera.position.set(cam.pos.x, cam.pos.y, cam.pos.z);
   };
 
@@ -85,13 +65,13 @@ export const useCameraHandler = () => {
       // Handle animation
       // ...when it's focused
       run((data, progress) => {
-        applyLookProgress(data, progress, camera);
-        applyPositionProgress(data, progress, camera);
+        applyLook(data, progress, camera);
+        applyPosition(data, progress, camera);
       });
     } else {
       // Sync up camera from other logic
       // ...while it's not focused
-      cam.pos = camera.position;
+      cam.pos = camera.position.clone();
       cam.look = _getPlayerPos();
     }
   };
@@ -110,11 +90,11 @@ export const useCameraHandler = () => {
     start(
       {
         look: {
-          start: cam.look,
+          start: cam.look.clone(),
           end: look,
         },
         position: {
-          start: cam.pos,
+          start: cam.pos.clone(),
           end: pos,
         },
       },
