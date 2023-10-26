@@ -1,6 +1,6 @@
 import { useFrame, useLoader } from '@react-three/fiber';
-import { useRef } from 'react';
-import { AnimationMixer, Vector3 } from 'three';
+import { MutableRefObject, useEffect, useRef } from 'react';
+import { AnimationMixer, Group, Vector3 } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 import config from '../config/config';
@@ -18,10 +18,10 @@ const SPACE_KEY = ' ';
 const orientation = new Vector3(0, 0, 0);
 const DISTANCE_RANGE = 20;
 const keys: Record<string, Record<string, number>> = {
-  /*xAxis: {
-    ArrowRight: 1,
-    ArrowLeft: -1,
-  },*/
+  xAxis: {
+    a: -1,
+    e: 1,
+  },
   zAxis: {
     ArrowDown: -1,
     ArrowUp: 1,
@@ -31,18 +31,18 @@ const keys: Record<string, Record<string, number>> = {
     ArrowLeft: 1,
   },
 };
-const walkingKeys = Object.keys(keys).reduce((acc: string[], axis) => {
-  return acc.concat(Object.keys(keys[axis]));
-}, []);
 
 export const usePlayerHandler = () => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
   const isPlaying = useRef(false);
+  const isSideStep = useRef(false);
   const nearestObject = useRef<NearestObject>({});
-  const fbx = useLoader(FBXLoader, './src/assets/walking.fbx');
-  const mixer = useRef<AnimationMixer | null>(new AnimationMixer(fbx));
+  const fbxWalk = useLoader(FBXLoader, './src/assets/walk.fbx');
+  const fbxSideStep = useLoader(FBXLoader, './src/assets/side_step.fbx');
+  const mixer = useRef<AnimationMixer | null>(new AnimationMixer(fbxWalk));
+  const mixerSideStep = useRef<AnimationMixer | null>(new AnimationMixer(fbxSideStep));
 
   const focusNearestObject = () => {
     const { distance = DISTANCE_RANGE + 1, object } = nearestObject.current;
@@ -52,18 +52,44 @@ export const usePlayerHandler = () => {
     }
   };
 
+  const playAnimation = (
+    mixer: AnimationMixer | null,
+    obj: Group,
+    ref: MutableRefObject<boolean>,
+  ) => {
+    if (!mixer || ref.current) {
+      return;
+    }
+    const anim = mixer.clipAction(obj.animations[0]);
+    anim.play();
+    ref.current = true;
+    return anim;
+  };
+
+  const stopAnimation = (
+    mixer: AnimationMixer | null,
+    ref: MutableRefObject<boolean>,
+  ) => {
+    if (!mixer || !ref.current) {
+      return;
+    }
+    mixer.stopAllAction();
+    ref.current = false;
+  };
+
+  // useEffect(() => {
+  //   playAnimation(mixer.current, fbxSideStep, isSideStep);
+  // }, []);
+
   useKeyDown(({ key }: KeyboardEvent) => {
     // Handle movements
-    if (mixer.current && !isPlaying.current && walkingKeys.includes(key)) {
-      const action = mixer.current.clipAction(fbx.animations[0]);
-      action.play();
-      isPlaying.current = true;
-    }
     if (keys.xAxis?.[key]) {
+      playAnimation(mixerSideStep.current, fbxSideStep, isSideStep);
       orientation.x = keys.xAxis[key];
     }
     if (keys.zAxis?.[key]) {
       orientation.z = keys.zAxis[key];
+      playAnimation(mixer.current, fbxWalk, isPlaying);
     }
     if (keys.yAxis?.[key]) {
       orientation.y = keys.yAxis[key];
@@ -82,14 +108,12 @@ export const usePlayerHandler = () => {
   });
 
   useKeyUp(({ key }: KeyboardEvent) => {
-    if (isPlaying.current) {
-      mixer.current?.stopAllAction();
-      isPlaying.current = false;
-    }
     if (keys.xAxis?.[key]) {
+      stopAnimation(mixerSideStep.current, isSideStep);
       orientation.x = 0;
     }
     if (keys.zAxis?.[key]) {
+      stopAnimation(mixer.current, isPlaying);
       orientation.z = 0;
     }
     if (keys.yAxis?.[key]) {
@@ -173,5 +197,5 @@ export const usePlayerHandler = () => {
     runCameraFrame();
   });
 
-  return fbx;
+  return fbxWalk;
 };
