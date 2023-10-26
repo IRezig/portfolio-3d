@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import { extend, useLoader } from '@react-three/fiber';
+import { useEffect, useState } from 'react';
 import { FileLoader } from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
@@ -9,7 +10,11 @@ extend({ TextGeometry });
 
 export const Text = () => {
   const font = useLoader(FontLoader, './src/Roboto-Bold.json');
-  console.log(font);
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    if (font) setFontLoaded(true);
+  }, [font]);
 
   return (
     <mesh {...{ position: [0, 1, 0] }}>
