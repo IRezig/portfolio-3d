@@ -27,30 +27,60 @@ export const useCameraHandler = () => {
   const { objects } = useSceneContext();
   const isFocused = () => cam.focused;
 
-  const getPlayerPos = () => {
-    const player = objects.player;
-    if (!player?.current) {
-      return null;
-    }
-    return player.current.position;
-  };
-
+  /**
+   * Focus animation
+   */
   const focusObject = (target: Vector3) => {
     cam.focused = true;
     camBeforeFocus = cam;
-    const playerPos = getPlayerPos();
+    const playerPos = _getPlayerPos();
     if (playerPos) {
       _animateTo(1.2, target, playerPos);
     }
   };
 
   const unfocusObject = () => {
-    const playerPos = getPlayerPos();
+    const playerPos = _getPlayerPos();
     if (camBeforeFocus && playerPos) {
       _animateTo(0.7, playerPos, camBeforeFocus.pos, () => {
         cam.focused = false;
       });
     }
+  };
+
+  const runCameraFrame = (camera: Camera) => {
+    if (cam.focused) {
+      // Handle animation
+      // ...when it's focused
+      run((data, progress) => {
+        const diff = {
+          x: data.look.end.x - data.look.start.x,
+          y: data.look.end.y - data.look.start.y,
+          z: data.look.end.z - data.look.start.z,
+        };
+        const applyProgress = (n: number, diff: number) => n + diff * progress;
+        cam.look = new Vector3(
+          applyProgress(data.look.start.x, diff.x),
+          applyProgress(data.look.start.y, diff.y),
+          applyProgress(data.look.start.z, diff.z),
+        );
+
+        camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
+      });
+    } else {
+      // Sync up camera from other logic
+      // ...while it's not focused
+      cam.pos = camera.position;
+      const playerPos = _getPlayerPos();
+      if (playerPos) {
+        cam.look = playerPos;
+      }
+    }
+  };
+
+  const _getPlayerPos = () => {
+    const player = objects.player?.current;
+    return player?.position ?? null;
   };
 
   const _animateTo = (
@@ -75,37 +105,10 @@ export const useCameraHandler = () => {
     );
   };
 
-  const syncLook = (look: Vector3) => {
-    cam.look = look;
-  };
-  const syncPosition = (pos: Vector3) => {
-    cam.pos = pos;
-  };
-
-  const runAnimationFrame = (camera: Camera) => {
-    run((data, progress) => {
-      const diff = {
-        x: data.look.end.x - data.look.start.x,
-        y: data.look.end.y - data.look.start.y,
-        z: data.look.end.z - data.look.start.z,
-      };
-      const applyProgress = (n: number, diff: number) => n + diff * progress;
-      cam.look = new Vector3(
-        applyProgress(data.look.start.x, diff.x),
-        applyProgress(data.look.start.y, diff.y),
-        applyProgress(data.look.start.z, diff.z),
-      );
-
-      camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
-    });
-  };
-
   return {
     focusObject,
     unfocusObject,
-    runAnimationFrame,
+    runCameraFrame,
     isFocused,
-    syncLook,
-    syncPosition,
   };
 };

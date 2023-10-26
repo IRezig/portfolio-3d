@@ -23,14 +23,7 @@ const keys: Record<string, Record<string, number>> = {
 };
 
 export const usePlayerHandler = () => {
-  const {
-    isFocused,
-    syncPosition,
-    runAnimationFrame,
-    unfocusObject,
-    focusObject,
-    syncLook,
-  } = useCameraHandler();
+  const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
 
@@ -87,25 +80,21 @@ export const usePlayerHandler = () => {
   };
 
   useFrame(({ camera }) => {
-    if (isFocused()) {
-      // Handle camera focus
-      runAnimationFrame(camera);
-    } else {
+    // Handle player movement
+    if (!isFocused()) {
       const player = objects.player?.current;
       if (!player) {
         return;
       }
-      // Handle player movement
       player.position.x += directionX * 1;
       player.position.z += directionZ * 1;
       camera.position.x += directionX * 1;
       camera.position.z += directionZ * 1;
-      syncLook(player.position);
-      syncPosition(camera.position);
-
-      camera.lookAt(player.position.x, player.position.y, player.position.z);
 
       checkDistanceWithBall(player.position);
     }
+
+    // Handle camera
+    runCameraFrame(camera);
   });
 };
