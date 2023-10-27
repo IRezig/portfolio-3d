@@ -12,7 +12,7 @@ export const Ground = () => {
       rotation={groundRotation}
       position={[0, 0, 0]}
     >
-      <meshPhongMaterial attach={'material'} color="#888" />
+      <meshPhongMaterial attach={'material'} color="rgb(174, 142, 122)" />
     </Plane>
   );
 };
