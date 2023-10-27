@@ -83,9 +83,9 @@ export const usePlayerHandler = (): Group => {
     if (keys.zAxis?.[key]) {
       orientation.z = keys.zAxis[key];
       if (orientation.z > 0) {
-        playAnimation(fbxWalkBack);
-      } else {
         playAnimation(fbxWalk);
+      } else {
+        playAnimation(fbxWalkBack);
       }
     }
     if (keys.yAxis?.[key]) {
