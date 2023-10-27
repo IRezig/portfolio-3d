@@ -8,8 +8,9 @@ export const Horizon = () => {
 
   return (
     <>
+      <color attach="background" args={[config.scene.backgroundColor]} />
       {/* Fog */}
-      <fog attach="fog" ref={fogRef} args={[config.scene.horizonColor, 40, 140]} />
+      <fog attach="fog" ref={fogRef} args={[config.scene.horizonColor, 0, 520]} />
     </>
   );
 };
