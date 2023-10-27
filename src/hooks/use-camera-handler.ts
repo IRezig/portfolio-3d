@@ -1,3 +1,4 @@
+import { easings } from '@react-spring/three';
 import { useThree } from '@react-three/fiber';
 import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 
@@ -6,6 +7,7 @@ import { useSceneContext } from '../context/scene-context';
 import { useAnimation } from './use-animation';
 
 interface FocusAnimData {
+  easing: (n: number) => number;
   look: {
     start: Vector3;
     end: Vector3;
@@ -33,14 +35,6 @@ const cam = {
 };
 let camBeforeFocus: typeof cam | null = null;
 
-function easeInOutQuad(t: number, intensity = 1.8) {
-  const easedIn = Math.pow(t, intensity);
-  const easedOut = Math.pow(1 - t, intensity);
-  const eased =
-    t < 0.5 ? easedIn / (easedIn + easedOut) : 1 - easedOut / (easedIn + easedOut);
-  return eased;
-}
-
 export const useCameraHandler = () => {
   const { camera } = useThree();
   const { start, run } = useAnimation<FocusAnimData>();
@@ -59,14 +53,15 @@ export const useCameraHandler = () => {
       .normalize();
     const offsetBackwardPosition = new Vector3()
       .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(12))
-      .add(new Vector3(10, 4, 0));
+      .add(new Vector3(4, 2, 0));
 
     _animateTo(
-      0.4,
+      0.8,
       playerPos,
       offsetBackwardPosition,
       config.scene.groundColor,
       config.scene.darkGroundColor,
+      easings.easeInOutElastic,
       () => {
         const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
         const offset = vec.multiplyScalar(-22);
@@ -80,6 +75,7 @@ export const useCameraHandler = () => {
           finalPosition,
           config.scene.groundColor,
           config.scene.darkGroundColor,
+          easings.easeInOutElastic,
         );
       },
     );
@@ -93,6 +89,7 @@ export const useCameraHandler = () => {
         camBeforeFocus.pos,
         config.scene.backgroundColor,
         config.scene.groundColor,
+        easings.easeInOutElastic,
         () => {
           cam.focused = false;
         },
@@ -115,7 +112,7 @@ export const useCameraHandler = () => {
       // ...while it's not focused
       cam.pos = camera.position.clone();
       cam.look = _getPlayerPos();
-      camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
+      camera.lookAt(cam.look);
     }
   };
 
@@ -123,19 +120,16 @@ export const useCameraHandler = () => {
    * Animation helpers
    */
   const _applyLook = (data: FocusAnimData, progress: number) => {
-    const smoothProgress = easeInOutQuad(progress);
-    cam.look = data.look.start.clone().lerp(data.look.end, smoothProgress);
+    cam.look = data.look.start.clone().lerp(data.look.end, data.easing(progress));
     camera.lookAt(cam.look);
   };
 
   const _applyPosition = (data: FocusAnimData, progress: number) => {
-    const smoothProgress = easeInOutQuad(progress);
-    cam.pos = data.position.start.clone().lerp(data.position.end, smoothProgress);
+    cam.pos = data.position.start.clone().lerp(data.position.end, data.easing(progress));
     camera.position.copy(cam.pos);
   };
 
   const _applyColor = (data: FocusAnimData, progress: number) => {
-    const smoothProgress = easeInOutQuad(progress);
     const { background, ground, fog } = objects;
     if (!background || !ground || !fog) {
       return;
@@ -145,7 +139,7 @@ export const useCameraHandler = () => {
     const bg = background.current as unknown as Color;
     cam.bgColor = data.backgroundColor.start
       .clone()
-      .lerp(data.backgroundColor.end, smoothProgress);
+      .lerp(data.backgroundColor.end, data.easing(progress));
     bg.set?.(cam.bgColor);
     f.color.set(cam.bgColor);
     cam.groundColor = data.groundColor.start.clone().lerp(data.groundColor.end, progress);
@@ -163,10 +157,12 @@ export const useCameraHandler = () => {
     pos: Vector3,
     bgColor: string,
     groundColor: string,
+    easing: (n: number) => number = (n) => n,
     callback?: () => void,
   ) => {
     start(
       {
+        easing,
         look: {
           start: cam.look.clone(),
           end: look,
