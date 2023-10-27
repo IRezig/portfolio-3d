@@ -44,11 +44,9 @@ class AnimationStore<X, Y extends number> {
   history: Record<number, X>;
   state: X;
 
-  constructor(initialStep: Y, state: X) {
+  constructor(state: X) {
     this.state = state;
-    this.history = {
-      [initialStep]: state,
-    };
+    this.history = {};
   }
 
   getStateFor(step: Y) {
@@ -84,7 +82,7 @@ export const useCameraHandler = () => {
   };
 
   const animStore = useRef(
-    new FocusAnimationStore(FocusAnimationState.Idle, {
+    new FocusAnimationStore({
       look: _getPlayerPos(),
       pos: camera.position.clone(),
       bgColor: new Color(config.scene.backgroundColor),
@@ -111,6 +109,7 @@ export const useCameraHandler = () => {
       config.scene.groundColor,
       config.scene.darkGroundColor,
     );
+    animStore.current.update(FocusAnimationState.Idle, animStore.current.state);
 
     _animateTo(0.64, zoomOutStep, easings.easeInOutQuad, () => {
       animStore.current.update(FocusAnimationState.ZoomingOut, zoomOutStep);
