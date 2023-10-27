@@ -8,7 +8,7 @@ import { usePlayerHandler } from '../../hooks/use-player-handler';
 export const Player = () => {
   const ref = useRef<Group>(null);
   const { exposeObject } = useSceneContext();
-  const scale = 0.1;
+  const scale = 0.05;
 
   const fbx = usePlayerHandler();
   if (fbx) {
