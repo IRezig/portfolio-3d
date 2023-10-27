@@ -52,11 +52,11 @@ export const useCameraHandler = () => {
       .subVectors(camera.position.clone(), playerPos)
       .normalize();
     const offsetBackwardPosition = new Vector3()
-      .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(12))
-      .add(new Vector3(4, 2, 0));
+      .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(5))
+      .add(new Vector3(1, 1, 0));
 
     _animateTo(
-      0.8,
+      0.64,
       playerPos,
       offsetBackwardPosition,
       config.scene.groundColor,
