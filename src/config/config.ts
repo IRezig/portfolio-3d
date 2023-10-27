@@ -14,6 +14,8 @@ export default {
     height: CAMERA_HEIGHT,
     distance: CAMERA_DISTANCE,
     initialPosition: new Vector3(0, CAMERA_HEIGHT, CAMERA_DISTANCE),
+    focusDuration: 0.8,
+    unfocusDuration: 0.8,
   },
   player: {
     initialPosition: new Vector3(0, 0, 0),

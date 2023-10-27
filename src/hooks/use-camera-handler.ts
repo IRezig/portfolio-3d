@@ -52,7 +52,7 @@ export const useCameraHandler = () => {
     const upwardOffset = new Vector3(14, 14, 0);
     const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
     _animateTo(
-      2,
+      config.camera.focusDuration,
       targetLook,
       finalPosition,
       config.scene.groundColor,
@@ -63,7 +63,7 @@ export const useCameraHandler = () => {
   const unfocusObject = () => {
     if (camBeforeFocus) {
       _animateTo(
-        1,
+        config.camera.unfocusDuration,
         camBeforeFocus.look,
         camBeforeFocus.pos,
         config.scene.backgroundColor,
@@ -104,7 +104,6 @@ export const useCameraHandler = () => {
 
   const _applyPosition = (data: FocusAnimData, progress: number) => {
     cam.pos = data.position.start.clone().lerp(data.position.end, progress);
-    console.log('POS', progress, cam.pos);
     camera.position.copy(cam.pos);
   };
 
