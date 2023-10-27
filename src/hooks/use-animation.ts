@@ -11,7 +11,7 @@ interface AnimationType<T> {
 export const useAnimation = <T>() => {
   const animRef = useRef<AnimationType<T> | null>(null);
 
-  const start = (data: T, duration = 1200, callback?: () => void) => {
+  const startAnimation = (data: T, duration = 1200, callback?: () => void) => {
     animRef.current = {
       data,
       clock: new Clock(),
@@ -35,7 +35,7 @@ export const useAnimation = <T>() => {
   };
 
   return {
-    start,
+    startAnimation,
     run,
     isAnimating: () => animRef.current !== null,
   };
