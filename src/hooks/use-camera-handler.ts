@@ -1,5 +1,5 @@
-import { Camera, ThreeElements, useThree } from '@react-three/fiber';
-import { Fog, MeshPhongMaterial, Vector3 } from 'three';
+import { ThreeElements, useThree } from '@react-three/fiber';
+import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 
 import config from '../config/config';
 import { useSceneContext } from '../context/scene-context';
@@ -15,11 +15,21 @@ interface FocusAnimData {
     start: Vector3;
     end: Vector3;
   };
+  backgroundColor: {
+    start: Color;
+    end: Color;
+  };
+  groundColor: {
+    start: Color;
+    end: Color;
+  };
 }
 
 const cam = {
   pos: new Vector3(0, 0, 0),
   look: new Vector3(0, 0, 0),
+  bgColor: new Color(config.scene.backgroundColor),
+  groundColor: new Color(config.scene.groundColor),
   focused: false,
 };
 let camBeforeFocus: typeof cam | null = null;
@@ -30,47 +40,39 @@ export const useCameraHandler = () => {
   const { objects } = useSceneContext();
   const isFocused = () => cam.focused;
 
-  const updateAmbianceColor = (color: string) => {
-    const fog = objects.fog?.current as unknown as Fog;
-    const bg = objects.background?.current as unknown as ThreeElements['color'];
-    if (!fog || !bg) {
-      return;
-    }
-    bg.set?.(color);
-    fog.color.set(color);
-  };
-  const updateGroundColor = (color: string) => {
-    const ground = objects.ground?.current as unknown as MeshPhongMaterial;
-    if (!ground) {
-      return;
-    }
-    ground.color.set?.(color);
-  };
-
   /**
    * Focus animation
    */
   const focusObject = (targetLook: Vector3) => {
     cam.focused = true;
     camBeforeFocus = { ...cam };
-    updateAmbianceColor(config.scene.groundColor);
-    updateGroundColor(config.scene.darkGroundColor);
     const playerPos = _getPlayerPos();
     const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
     const offset = vec.multiplyScalar(-20);
     const targetPosition = new Vector3().addVectors(playerPos, offset);
     const upwardOffset = new Vector3(14, 14, 0);
     const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
-    _animateTo(1.2, targetLook, finalPosition);
+    _animateTo(
+      1.2,
+      targetLook,
+      finalPosition,
+      config.scene.groundColor,
+      config.scene.darkGroundColor,
+    );
   };
 
   const unfocusObject = () => {
     if (camBeforeFocus) {
-      updateAmbianceColor(config.scene.backgroundColor);
-      updateGroundColor(config.scene.groundColor);
-      _animateTo(0.7, camBeforeFocus.look, camBeforeFocus.pos, () => {
-        cam.focused = false;
-      });
+      _animateTo(
+        0.7,
+        camBeforeFocus.look,
+        camBeforeFocus.pos,
+        config.scene.backgroundColor,
+        config.scene.groundColor,
+        () => {
+          cam.focused = false;
+        },
+      );
       camBeforeFocus = null;
     }
   };
@@ -80,8 +82,9 @@ export const useCameraHandler = () => {
       // Handle animation
       // ...when it's focused
       run((data, progress) => {
-        _applyLook(data, progress, camera);
-        _applyPosition(data, progress, camera);
+        _applyLook(data, progress);
+        _applyPosition(data, progress);
+        _applyColor(data, progress);
       });
     } else {
       // Sync up camera from other logic
@@ -95,18 +98,35 @@ export const useCameraHandler = () => {
   /**
    * Animation helpers
    */
-  const _applyLook = (data: FocusAnimData, progress: number, camera: Camera) => {
+  const _applyLook = (data: FocusAnimData, progress: number) => {
     const diff = diffVectors(data.look.end, data.look.start);
     const applyProgress = (n: number, d: number) => n + d * progress;
     cam.look = mergeVectors(data.look.start, diff, applyProgress);
     camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
   };
 
-  const _applyPosition = (data: FocusAnimData, progress: number, camera: Camera) => {
+  const _applyPosition = (data: FocusAnimData, progress: number) => {
     const diff = diffVectors(data.position.end, data.position.start);
     const applyProgress = (n: number, d: number) => n + d * progress;
     cam.pos = mergeVectors(data.position.start, diff, applyProgress);
     camera.position.set(cam.pos.x, cam.pos.y, cam.pos.z);
+  };
+
+  const _applyColor = (data: FocusAnimData, progress: number) => {
+    const { background, ground, fog } = objects;
+    if (!background || !ground || !fog) {
+      return;
+    }
+    const f = fog.current as unknown as Fog;
+    const gr = ground.current as unknown as MeshPhongMaterial;
+    const bg = background.current as unknown as ThreeElements['color'];
+    cam.bgColor = data.backgroundColor.start
+      .clone()
+      .lerp(data.backgroundColor.end, progress);
+    bg.set?.(cam.bgColor.clone());
+    f.color.set(cam.bgColor.clone());
+    cam.groundColor = data.groundColor.start.clone().lerp(data.groundColor.end, progress);
+    gr.color.set(cam.groundColor.clone());
   };
 
   const _getPlayerPos = () => {
@@ -118,6 +138,8 @@ export const useCameraHandler = () => {
     duration: number,
     look: Vector3,
     pos: Vector3,
+    bgColor: string,
+    groundColor: string,
     callback?: () => void,
   ) => {
     start(
@@ -129,6 +151,14 @@ export const useCameraHandler = () => {
         position: {
           start: cam.pos.clone(),
           end: pos,
+        },
+        backgroundColor: {
+          start: new Color(cam.bgColor),
+          end: new Color(bgColor),
+        },
+        groundColor: {
+          start: new Color(cam.groundColor),
+          end: new Color(groundColor),
         },
       },
       duration,
