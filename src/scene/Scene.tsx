@@ -4,12 +4,14 @@ import { RefObject, Suspense, useRef, useState } from 'react';
 import { Loader } from '../components/Loader';
 import config from '../config/config';
 import { ObjectType, SceneContext, SceneContextType } from '../context/scene-context';
+import { Effects } from './ambiance/Effects';
+import { Horizon } from './ambiance/horizon';
+import { Lights } from './ambiance/lights';
 import { Ball } from './objects/Ball';
 import { Ground } from './objects/Ground';
 import { Player } from './objects/Player';
 import { SecondBall } from './objects/SecondBall';
 import { Text } from './objects/Text';
-import { SceneSetup } from './SceneSetup';
 
 export const Scene = () => {
   const [objects, setObjects] = useState<SceneContextType['objects']>({});
@@ -29,7 +31,12 @@ export const Scene = () => {
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
       <Canvas shadows camera={{ position: config.camera.initialPosition }}>
         <Suspense fallback={<Loader />}>
-          <SceneSetup />
+          {/* Ambiance */}
+          <Horizon />
+          <Lights />
+          <Effects />
+
+          {/* Objects */}
           <Ball />
           <SecondBall />
           <Player />

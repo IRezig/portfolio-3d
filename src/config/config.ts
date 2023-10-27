@@ -4,6 +4,10 @@ const CAMERA_HEIGHT = 20;
 const CAMERA_DISTANCE = 40;
 
 export default {
+  scene: {
+    groundColor: '#fff',
+    horizonColor: '#fff',
+  },
   camera: {
     height: CAMERA_HEIGHT,
     distance: CAMERA_DISTANCE,

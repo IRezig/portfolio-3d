@@ -1,12 +1,10 @@
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
-
-import config from '../config/config';
+import config from '../../config/config';
 
 const angleToRad = (degrees: number) => {
   return (Math.PI / 180) * degrees;
 };
 
-export const SceneSetup = () => {
+export const Lights = () => {
   return (
     <>
       {/* Light */}
@@ -36,19 +34,6 @@ export const SceneSetup = () => {
           config.objects.ball.initialPosition.z,
         ]}
       />
-
-      {/* Background Color */}
-      <color
-        {...{
-          attach: 'background',
-          args: ['rgb(224, 192, 172)'],
-        }}
-      />
-
-      {/* Post-processing effects */}
-      <EffectComposer>
-        <Bloom mipmapBlur luminanceThreshold={1.4} radius={0.4} />
-      </EffectComposer>
     </>
   );
 };
