@@ -39,6 +39,7 @@ export const usePlayerHandler = (): Group => {
   const isPlaying = useRef(false);
   const nearestObject = useRef<NearestObject>({});
   const fbxWalk = useLoader(FBXLoader, './src/assets/walk.fbx');
+  const fbxWalkBack = useLoader(FBXLoader, './src/assets/walk_back.fbx');
   const fbxSideStepRight = useLoader(FBXLoader, './src/assets/side_step_right.fbx');
   const fbxSideStepLeft = useLoader(FBXLoader, './src/assets/side_step_left.fbx');
   const mixer = useRef<AnimationMixer | null>(new AnimationMixer(fbxWalk));
@@ -81,7 +82,11 @@ export const usePlayerHandler = (): Group => {
     }
     if (keys.zAxis?.[key]) {
       orientation.z = keys.zAxis[key];
-      playAnimation(fbxWalk);
+      if (orientation.z > 0) {
+        playAnimation(fbxWalkBack);
+      } else {
+        playAnimation(fbxWalk);
+      }
     }
     if (keys.yAxis?.[key]) {
       orientation.y = keys.yAxis[key];
