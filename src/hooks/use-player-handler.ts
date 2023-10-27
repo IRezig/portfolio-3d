@@ -53,7 +53,7 @@ export const usePlayerHandler = (): Group => {
   };
 
   const playAnimation = (obj: Group) => {
-    if (!mixer.current || isPlaying.current) {
+    if (isFocused() || !mixer.current || isPlaying.current) {
       return;
     }
     const anim = mixer.current.clipAction(obj.animations[0]);
