@@ -46,17 +46,34 @@ export const useCameraHandler = () => {
     cam.focused = true;
     camBeforeFocus = { ...cam };
     const playerPos = _getPlayerPos();
-    const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
-    const offset = vec.multiplyScalar(-20);
-    const targetPosition = new Vector3().addVectors(playerPos, offset);
-    const upwardOffset = new Vector3(14, 14, 0);
-    const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
+    const cameraToPlayerVector = new Vector3()
+      .subVectors(camera.position.clone(), playerPos)
+      .normalize();
+    const offsetBackwardPosition = new Vector3()
+      .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(20))
+      .add(new Vector3(10, 4, 0));
+
     _animateTo(
       config.camera.focusDuration,
-      targetLook,
-      finalPosition,
+      playerPos,
+      offsetBackwardPosition,
       config.scene.groundColor,
       config.scene.darkGroundColor,
+      () => {
+        const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
+        const offset = vec.multiplyScalar(-12);
+        const targetPosition = new Vector3().addVectors(playerPos, offset);
+        const upwardOffset = new Vector3(14, 14, 0);
+        const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
+
+        _animateTo(
+          config.camera.focusDuration,
+          targetLook,
+          finalPosition,
+          config.scene.groundColor,
+          config.scene.darkGroundColor,
+        );
+      },
     );
   };
 
