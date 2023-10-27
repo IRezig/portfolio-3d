@@ -1,5 +1,5 @@
 import { Camera, useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   AnimationClip,
   AnimationMixer,
@@ -9,11 +9,21 @@ import {
   VectorKeyframeTrack,
 } from 'three';
 
-export const useAnimationClip = (name: string, obj: Mesh | Group | Camera) => {
+export const useAnimationClip = (
+  name: string,
+  obj: Mesh | Group | Camera,
+  onFinish?: () => void,
+) => {
   const mixer = useRef(new AnimationMixer(obj));
 
+  useEffect(() => {
+    mixer.current.addEventListener('finished', () => {
+      onFinish?.();
+    });
+  }, []);
+
   useFrame((state, delta) => {
-    if (mixer.current) {
+    if (mixer.current && !!mixer.current.existingAction) {
       mixer.current.update(delta);
     }
   });

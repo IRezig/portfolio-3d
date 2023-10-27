@@ -4,18 +4,22 @@ import { Vector3, VectorKeyframeTrack } from 'three';
 import { useSceneContext } from '../context/scene-context';
 import { useAnimationClip } from './use-animation-clip';
 
-const cam = {
+const cam: {
+  pos: Vector3 | null;
+  focused: boolean;
+} = {
   pos: new Vector3(0, 0, 0),
-  look: new Vector3(0, 0, 0),
   focused: false,
 };
-let camBeforeFocus: typeof cam | null = null;
 
 export const useCameraHandler = () => {
   const { camera } = useThree();
   const { objects } = useSceneContext();
   const isFocused = () => cam.focused;
-  const { animate: unfocusAnim } = useAnimationClip('CameraUnfocus', camera);
+  const { animate: unfocusAnim } = useAnimationClip('CameraUnfocus', camera, () => {
+    cam.focused = false;
+    camera.lookAt(_getPlayerPos());
+  });
   const { animate: focusAnim } = useAnimationClip('CameraFocus', camera);
 
   /**
@@ -23,7 +27,8 @@ export const useCameraHandler = () => {
    */
   const focusObject = (targetLook: Vector3) => {
     cam.focused = true;
-    camBeforeFocus = { ...cam };
+    cam.pos = camera.position.clone();
+    camera.lookAt(targetLook);
     const playerPos = _getPlayerPos();
     const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
     const offset = vec.multiplyScalar(-20);
@@ -33,22 +38,22 @@ export const useCameraHandler = () => {
     const focusTracks = new VectorKeyframeTrack(
       '.position',
       [0, 1.2],
-      [...camera.position, ...finalPosition],
+      [...cam.pos, ...finalPosition],
     );
     focusAnim(1.2, [focusTracks]);
   };
 
   const unfocusObject = () => {
-    if (!camBeforeFocus) {
+    if (!cam.pos) {
       return;
     }
     const unfocusTracks = new VectorKeyframeTrack(
       '.position',
       [0, 0.7],
-      [...camera.position, ...camBeforeFocus.pos],
+      [...camera.position, ...cam.pos],
     );
     unfocusAnim(0.7, [unfocusTracks]);
-    camBeforeFocus = null;
+    cam.pos = null;
   };
 
   const _getPlayerPos = () => {
@@ -64,7 +69,7 @@ export const useCameraHandler = () => {
       // Sync up camera from other logic
       // ...while it's not focused
       cam.pos = camera.position.clone();
-      cam.look = _getPlayerPos();
+      camera.lookAt(_getPlayerPos());
     }
   };
 

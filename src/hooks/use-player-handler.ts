@@ -6,8 +6,8 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import config from '../config/config';
 import { useMenuContext } from '../context/menu-context';
 import { ObjectType, useSceneContext } from '../context/scene-context';
-import { useCameraHandler } from './use-camera-handler';
 import { useKeyDown, useKeyUp } from './use-key-press';
+import { useCameraHandler } from './use-new-camera-handler';
 
 interface NearestObject {
   distance?: number;
