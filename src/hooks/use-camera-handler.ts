@@ -61,7 +61,7 @@ export const useCameraHandler = () => {
       offsetBackwardPosition,
       config.scene.groundColor,
       config.scene.darkGroundColor,
-      easings.easeInOutElastic,
+      easings.easeInOutQuad,
       () => {
         const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
         const offset = vec.multiplyScalar(-22);
@@ -75,7 +75,7 @@ export const useCameraHandler = () => {
           finalPosition,
           config.scene.groundColor,
           config.scene.darkGroundColor,
-          easings.easeInOutElastic,
+          easings.easeInOutQuad,
         );
       },
     );
@@ -89,7 +89,7 @@ export const useCameraHandler = () => {
         camBeforeFocus.pos,
         config.scene.backgroundColor,
         config.scene.groundColor,
-        easings.easeInOutElastic,
+        easings.easeInOutQuad,
         () => {
           cam.focused = false;
         },
