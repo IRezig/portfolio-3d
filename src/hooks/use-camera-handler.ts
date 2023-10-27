@@ -33,6 +33,14 @@ const cam = {
 };
 let camBeforeFocus: typeof cam | null = null;
 
+function easeInOutQuad(t: number, intensity = 1.8) {
+  const easedIn = Math.pow(t, intensity);
+  const easedOut = Math.pow(1 - t, intensity);
+  const eased =
+    t < 0.5 ? easedIn / (easedIn + easedOut) : 1 - easedOut / (easedIn + easedOut);
+  return eased;
+}
+
 export const useCameraHandler = () => {
   const { camera } = useThree();
   const { start, run } = useAnimation<FocusAnimData>();
@@ -50,18 +58,18 @@ export const useCameraHandler = () => {
       .subVectors(camera.position.clone(), playerPos)
       .normalize();
     const offsetBackwardPosition = new Vector3()
-      .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(20))
+      .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(12))
       .add(new Vector3(10, 4, 0));
 
     _animateTo(
-      config.camera.focusDuration,
+      0.4,
       playerPos,
       offsetBackwardPosition,
       config.scene.groundColor,
       config.scene.darkGroundColor,
       () => {
         const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
-        const offset = vec.multiplyScalar(-12);
+        const offset = vec.multiplyScalar(-22);
         const targetPosition = new Vector3().addVectors(playerPos, offset);
         const upwardOffset = new Vector3(14, 14, 0);
         const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
@@ -115,16 +123,19 @@ export const useCameraHandler = () => {
    * Animation helpers
    */
   const _applyLook = (data: FocusAnimData, progress: number) => {
-    cam.look = data.look.start.clone().lerp(data.look.end, progress);
+    const smoothProgress = easeInOutQuad(progress);
+    cam.look = data.look.start.clone().lerp(data.look.end, smoothProgress);
     camera.lookAt(cam.look);
   };
 
   const _applyPosition = (data: FocusAnimData, progress: number) => {
-    cam.pos = data.position.start.clone().lerp(data.position.end, progress);
+    const smoothProgress = easeInOutQuad(progress);
+    cam.pos = data.position.start.clone().lerp(data.position.end, smoothProgress);
     camera.position.copy(cam.pos);
   };
 
   const _applyColor = (data: FocusAnimData, progress: number) => {
+    const smoothProgress = easeInOutQuad(progress);
     const { background, ground, fog } = objects;
     if (!background || !ground || !fog) {
       return;
@@ -134,7 +145,7 @@ export const useCameraHandler = () => {
     const bg = background.current as unknown as Color;
     cam.bgColor = data.backgroundColor.start
       .clone()
-      .lerp(data.backgroundColor.end, progress);
+      .lerp(data.backgroundColor.end, smoothProgress);
     bg.set?.(cam.bgColor);
     f.color.set(cam.bgColor);
     cam.groundColor = data.groundColor.start.clone().lerp(data.groundColor.end, progress);
