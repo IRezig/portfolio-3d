@@ -178,12 +178,12 @@ export const usePlayerHandler = (): Group => {
       player.rotation.y += turn(orientation.y);
 
       // Calculate "forward" vector
-      // ...then apply to player and camera
       const forward = getOrientationVector(player.rotation.y);
-      const sideways = getOrientationVectorSideways(player.rotation.y);
       player.position.add(forward.clone().multiplyScalar(orientation.z));
       camera.position.add(forward.clone().multiplyScalar(orientation.z));
 
+      // Calculate "sideways" vector
+      const sideways = getOrientationVectorSideways(player.rotation.y);
       player.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
       camera.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
 
