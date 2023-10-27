@@ -1,6 +1,7 @@
-import { Camera, useThree } from '@react-three/fiber';
-import { Vector3 } from 'three';
+import { Camera, ThreeElements, useThree } from '@react-three/fiber';
+import { Fog, MeshPhongMaterial, Vector3 } from 'three';
 
+import config from '../config/config';
 import { useSceneContext } from '../context/scene-context';
 import { diffVectors, mergeVectors } from '../services/vector-helpers';
 import { useAnimation } from './use-animation';
@@ -29,12 +30,31 @@ export const useCameraHandler = () => {
   const { objects } = useSceneContext();
   const isFocused = () => cam.focused;
 
+  const updateAmbianceColor = (color: string) => {
+    const fog = objects.fog?.current as unknown as Fog;
+    const bg = objects.background?.current as unknown as ThreeElements['color'];
+    if (!fog || !bg) {
+      return;
+    }
+    bg.set?.(color);
+    fog.color.set(color);
+  };
+  const updateGroundColor = (color: string) => {
+    const ground = objects.ground?.current as unknown as MeshPhongMaterial;
+    if (!ground) {
+      return;
+    }
+    ground.color.set?.(color);
+  };
+
   /**
    * Focus animation
    */
   const focusObject = (targetLook: Vector3) => {
     cam.focused = true;
     camBeforeFocus = { ...cam };
+    updateAmbianceColor(config.scene.groundColor);
+    updateGroundColor(config.scene.darkGroundColor);
     const playerPos = _getPlayerPos();
     const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
     const offset = vec.multiplyScalar(-20);
@@ -46,6 +66,8 @@ export const useCameraHandler = () => {
 
   const unfocusObject = () => {
     if (camBeforeFocus) {
+      updateAmbianceColor(config.scene.backgroundColor);
+      updateGroundColor(config.scene.groundColor);
       _animateTo(0.7, camBeforeFocus.look, camBeforeFocus.pos, () => {
         cam.focused = false;
       });

@@ -132,7 +132,7 @@ export const usePlayerHandler = (): Group => {
       object: undefined,
     };
     for (const key in objects) {
-      if (key === 'player') {
+      if (key === 'player' || key === 'fog' || key === 'background' || key === 'ground') {
         continue;
       }
       const object = objects[key]?.current;
