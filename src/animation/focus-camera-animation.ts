@@ -6,6 +6,7 @@ import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 import config from '../config/config';
 import { useSceneContext } from '../context/scene-context';
 import { useAnimation } from '../hooks/use-animation';
+import { getObjectAligment, HeadSide } from '../services/vector-helpers';
 import { AnimationStore } from './animation-store';
 
 export interface FocusAnimData {
@@ -88,6 +89,9 @@ export const useCameraAnimation = () => {
       .addVectors(camera.position.clone(), cameraToPlayerVector.multiplyScalar(5))
       .add(new Vector3(1, 1, 0));
 
+    const alignment = getObjectAligment(targetLook, playerPos, camera.position);
+    console.log(alignment);
+
     const zoomOutStep = animStore.current.create(
       playerPos,
       offsetBackwardPosition,
@@ -101,7 +105,7 @@ export const useCameraAnimation = () => {
       const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
       const offset = vec.multiplyScalar(-22);
       const targetPosition = new Vector3().addVectors(playerPos, offset);
-      const upwardOffset = new Vector3(14, 14, 0);
+      const upwardOffset = new Vector3(alignment === HeadSide.Left ? 0 : 0, 14, 0);
       const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
       const focusingStep = animStore.current.create(
         targetLook,

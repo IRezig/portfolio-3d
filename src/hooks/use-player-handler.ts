@@ -1,4 +1,4 @@
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame, useLoader, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
 import { AnimationMixer, Group, Vector3 } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
@@ -6,6 +6,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import config from '../config/config';
 import { useMenuContext } from '../context/menu-context';
 import { ObjectType, useSceneContext } from '../context/scene-context';
+import { isObjectBehind, isObjectInFov } from '../services/vector-helpers';
 import { useCameraHandler } from './use-camera-handler';
 import { useKeyDown, useKeyUp } from './use-key-press';
 
@@ -16,7 +17,7 @@ interface NearestObject {
 
 const SPACE_KEY = ' ';
 const orientation = new Vector3(0, 0, 0);
-const DISTANCE_RANGE = 20;
+const DISTANCE_RANGE = 40;
 const keys: Record<string, Record<string, number>> = {
   xAxis: {
     a: 1,
@@ -32,10 +33,11 @@ const keys: Record<string, Record<string, number>> = {
   },
 };
 
-export const usePlayerHandler = (): Group => {
+export const usePlayerHandler = () => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
+  const { camera } = useThree();
   const isPlaying = useRef(false);
   const nearestObject = useRef<NearestObject>({});
   const fbxWalk = useLoader(FBXLoader, './src/assets/walk.fbx');
@@ -135,8 +137,15 @@ export const usePlayerHandler = (): Group => {
       if (key === 'player' || key === 'fog' || key === 'background' || key === 'ground') {
         continue;
       }
+
+      // Ignore those on the backside
+      // ...or outside the FOV
       const object = objects[key]?.current;
-      if (!object) {
+      if (
+        !object ||
+        isObjectBehind(object.position, currentPos, camera.position) ||
+        !isObjectInFov(object.position, currentPos, camera.position, 90)
+      ) {
         continue;
       }
       const distance = currentPos.distanceTo(object.position);

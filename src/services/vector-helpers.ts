@@ -17,3 +17,50 @@ export const diffVectors = (end: Vector3, start: Vector3) => {
   const z = end.z - start.z;
   return new Vector3(x, y, z);
 };
+
+const dotProduct = (objectPos: Vector3, playerPos: Vector3, cameraPos: Vector3) => {
+  const vectorToObject = new Vector3().subVectors(objectPos, playerPos).normalize();
+  const vectorToCamera = new Vector3().subVectors(cameraPos, playerPos).normalize();
+  return vectorToObject.dot(vectorToCamera);
+};
+
+export const isObjectBehind = (
+  objectPos: Vector3,
+  playerPos: Vector3,
+  cameraPos: Vector3,
+) => {
+  return dotProduct(objectPos, playerPos, cameraPos) > 0;
+};
+
+export const isObjectInFov = (
+  objectPos: Vector3,
+  playerPos: Vector3,
+  cameraPos: Vector3,
+  fov: number,
+) => {
+  const product = dotProduct(objectPos, playerPos, cameraPos);
+  if (product > 0) {
+    return false;
+  }
+
+  const rads = Math.acos(product);
+  const degrees = rads * (180 / Math.PI);
+  return !(degrees < 180 - fov / 2);
+};
+
+export enum HeadSide {
+  Left = 'Left',
+  Right = 'Right',
+}
+
+export const getObjectAligment = (
+  objectPos: Vector3,
+  playerPos: Vector3,
+  cameraPos: Vector3,
+): HeadSide => {
+  const vectorToObject = new Vector3().subVectors(objectPos, playerPos).normalize();
+  const vectorToCamera = new Vector3().subVectors(cameraPos, playerPos).normalize();
+  const crossProduct = new Vector3().crossVectors(vectorToObject, vectorToCamera);
+  const direction = Math.sign(crossProduct.y);
+  return direction === 1 ? HeadSide.Left : HeadSide.Right;
+};
