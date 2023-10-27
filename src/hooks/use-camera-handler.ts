@@ -1,9 +1,8 @@
-import { ThreeElements, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 
 import config from '../config/config';
 import { useSceneContext } from '../context/scene-context';
-import { diffVectors, mergeVectors } from '../services/vector-helpers';
 import { useAnimation } from './use-animation';
 
 interface FocusAnimData {
@@ -53,7 +52,7 @@ export const useCameraHandler = () => {
     const upwardOffset = new Vector3(14, 14, 0);
     const finalPosition = new Vector3().addVectors(targetPosition, upwardOffset);
     _animateTo(
-      1.2,
+      2,
       targetLook,
       finalPosition,
       config.scene.groundColor,
@@ -64,7 +63,7 @@ export const useCameraHandler = () => {
   const unfocusObject = () => {
     if (camBeforeFocus) {
       _animateTo(
-        0.7,
+        1,
         camBeforeFocus.look,
         camBeforeFocus.pos,
         config.scene.backgroundColor,
@@ -99,17 +98,14 @@ export const useCameraHandler = () => {
    * Animation helpers
    */
   const _applyLook = (data: FocusAnimData, progress: number) => {
-    const diff = diffVectors(data.look.end, data.look.start);
-    const applyProgress = (n: number, d: number) => n + d * progress;
-    cam.look = mergeVectors(data.look.start, diff, applyProgress);
-    camera.lookAt(cam.look.x, cam.look.y, cam.look.z);
+    cam.look = data.look.start.clone().lerp(data.look.end, progress);
+    camera.lookAt(cam.look);
   };
 
   const _applyPosition = (data: FocusAnimData, progress: number) => {
-    const diff = diffVectors(data.position.end, data.position.start);
-    const applyProgress = (n: number, d: number) => n + d * progress;
-    cam.pos = mergeVectors(data.position.start, diff, applyProgress);
-    camera.position.set(cam.pos.x, cam.pos.y, cam.pos.z);
+    cam.pos = data.position.start.clone().lerp(data.position.end, progress);
+    console.log('POS', progress, cam.pos);
+    camera.position.copy(cam.pos);
   };
 
   const _applyColor = (data: FocusAnimData, progress: number) => {
@@ -119,7 +115,7 @@ export const useCameraHandler = () => {
     }
     const f = fog.current as unknown as Fog;
     const gr = ground.current as unknown as MeshPhongMaterial;
-    const bg = background.current as unknown as ThreeElements['color'];
+    const bg = background.current as unknown as Color;
     cam.bgColor = data.backgroundColor.start
       .clone()
       .lerp(data.backgroundColor.end, progress);

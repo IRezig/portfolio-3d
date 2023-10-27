@@ -1,13 +1,12 @@
-import { ThreeElements } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { Fog } from 'three';
+import { Color, Fog } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
 
 export const Horizon = () => {
   const fogRef = useRef<Fog>(null);
-  const backgroundRef = useRef<ThreeElements['color']>(null);
+  const backgroundRef = useRef<Color>(null);
   const { exposeObject } = useSceneContext();
 
   useEffect(() => {
