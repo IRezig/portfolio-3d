@@ -1,7 +1,31 @@
+import { useThree } from '@react-three/fiber';
+import { useMemo } from 'react';
+import { Object3D, Vector3 } from 'three';
+
 import config from '../../config/config';
 
 const angleToRad = (degrees: number) => {
   return (Math.PI / 180) * degrees;
+};
+
+const SpotlightWithTarget = ({ targetPosition }: { targetPosition: Vector3 }) => {
+  const { scene } = useThree();
+  const target = useMemo(() => {
+    const targetObject = new Object3D();
+    targetObject.position.set(targetPosition.x, 0, targetPosition.z);
+    scene.add(targetObject);
+    return targetObject;
+  }, [scene, targetPosition]);
+
+  return (
+    <spotLight
+      castShadow
+      args={['red', 240, 100]}
+      angle={angleToRad(45)}
+      target={target}
+      position={targetPosition}
+    />
+  );
 };
 
 export const Lights = () => {
@@ -25,14 +49,19 @@ export const Lights = () => {
 
       <spotLight
         castShadow
-        intensity={240}
-        args={['white', 1, 100]}
+        args={['white', 820, 40]}
         angle={angleToRad(45)}
-        position={[
-          config.objects.ball.initialPosition.x,
-          10,
-          config.objects.ball.initialPosition.z,
-        ]}
+        position={[0, 17, 0]}
+      />
+
+      <SpotlightWithTarget
+        targetPosition={
+          new Vector3(
+            config.objects.ball.initialPosition.x,
+            20,
+            config.objects.ball.initialPosition.z,
+          )
+        }
       />
     </>
   );
