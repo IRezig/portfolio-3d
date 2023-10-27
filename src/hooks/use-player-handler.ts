@@ -1,5 +1,5 @@
 import { useFrame, useLoader } from '@react-three/fiber';
-import { MutableRefObject, useRef } from 'react';
+import { useRef } from 'react';
 import { AnimationMixer, Group, Vector3 } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
@@ -19,8 +19,8 @@ const orientation = new Vector3(0, 0, 0);
 const DISTANCE_RANGE = 20;
 const keys: Record<string, Record<string, number>> = {
   xAxis: {
-    a: -1,
-    e: 1,
+    a: 1,
+    e: -1,
   },
   zAxis: {
     ArrowDown: -1,
@@ -32,17 +32,16 @@ const keys: Record<string, Record<string, number>> = {
   },
 };
 
-export const usePlayerHandler = () => {
+export const usePlayerHandler = (): Group => {
   const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
   const isPlaying = useRef(false);
-  const isSideStep = useRef(false);
   const nearestObject = useRef<NearestObject>({});
   const fbxWalk = useLoader(FBXLoader, './src/assets/walk.fbx');
-  const fbxSideStep = useLoader(FBXLoader, './src/assets/side_step.fbx');
+  const fbxSideStepRight = useLoader(FBXLoader, './src/assets/side_step_right.fbx');
+  const fbxSideStepLeft = useLoader(FBXLoader, './src/assets/side_step_left.fbx');
   const mixer = useRef<AnimationMixer | null>(new AnimationMixer(fbxWalk));
-  const mixerSideStep = useRef<AnimationMixer | null>(new AnimationMixer(fbxSideStep));
 
   const focusNearestObject = () => {
     const { distance = DISTANCE_RANGE + 1, object } = nearestObject.current;
@@ -52,44 +51,37 @@ export const usePlayerHandler = () => {
     }
   };
 
-  const playAnimation = (
-    mixer: AnimationMixer | null,
-    obj: Group,
-    ref: MutableRefObject<boolean>,
-  ) => {
-    if (!mixer || ref.current) {
+  const playAnimation = (obj: Group) => {
+    if (!mixer.current || isPlaying.current) {
       return;
     }
-    const anim = mixer.clipAction(obj.animations[0]);
+    const anim = mixer.current.clipAction(obj.animations[0]);
     anim.play();
-    ref.current = true;
+    isPlaying.current = true;
     return anim;
   };
 
-  const stopAnimation = (
-    mixer: AnimationMixer | null,
-    ref: MutableRefObject<boolean>,
-  ) => {
-    if (!mixer || !ref.current) {
+  const stopAnimation = () => {
+    if (!mixer.current || !isPlaying.current) {
       return;
     }
-    mixer.stopAllAction();
-    ref.current = false;
+    mixer.current.stopAllAction();
+    isPlaying.current = false;
   };
-
-  // useEffect(() => {
-  //   playAnimation(mixer.current, fbxSideStep, isSideStep);
-  // }, []);
 
   useKeyDown(({ key }: KeyboardEvent) => {
     // Handle movements
     if (keys.xAxis?.[key]) {
-      playAnimation(mixerSideStep.current, fbxSideStep, isSideStep);
       orientation.x = keys.xAxis[key];
+      if (orientation.x > 0) {
+        playAnimation(fbxSideStepLeft);
+      } else {
+        playAnimation(fbxSideStepRight);
+      }
     }
     if (keys.zAxis?.[key]) {
       orientation.z = keys.zAxis[key];
-      playAnimation(mixer.current, fbxWalk, isPlaying);
+      playAnimation(fbxWalk);
     }
     if (keys.yAxis?.[key]) {
       orientation.y = keys.yAxis[key];
@@ -109,11 +101,11 @@ export const usePlayerHandler = () => {
 
   useKeyUp(({ key }: KeyboardEvent) => {
     if (keys.xAxis?.[key]) {
-      stopAnimation(mixerSideStep.current, isSideStep);
+      stopAnimation();
       orientation.x = 0;
     }
     if (keys.zAxis?.[key]) {
-      stopAnimation(mixer.current, isPlaying);
+      stopAnimation();
       orientation.z = 0;
     }
     if (keys.yAxis?.[key]) {
@@ -164,6 +156,10 @@ export const usePlayerHandler = () => {
     return new Vector3(Math.sin(rotation), 0, Math.cos(rotation));
   };
 
+  const getOrientationVectorSideways = (rotation: number) => {
+    return new Vector3(Math.cos(rotation), 0, -Math.sin(rotation));
+  };
+
   useFrame(({ camera }, delta) => {
     mixer.current?.update(delta);
 
@@ -179,8 +175,12 @@ export const usePlayerHandler = () => {
       // Calculate "forward" vector
       // ...then apply to player and camera
       const forward = getOrientationVector(player.rotation.y);
+      const sideways = getOrientationVectorSideways(player.rotation.y);
       player.position.add(forward.clone().multiplyScalar(orientation.z));
       camera.position.add(forward.clone().multiplyScalar(orientation.z));
+
+      player.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
+      camera.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
 
       // Keep camera behind the player
       if (orientation.y !== 0) {

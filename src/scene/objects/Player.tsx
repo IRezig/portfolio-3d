@@ -7,6 +7,7 @@ import { usePlayerHandler } from '../../hooks/use-player-handler';
 
 export const Player = () => {
   const ref = useRef<Group>(null);
+  const primitiveRef = useRef<Mesh>(null);
   const { exposeObject } = useSceneContext();
   const scale = 0.1;
 
@@ -30,7 +31,7 @@ export const Player = () => {
       position={config.player.initialPosition}
       ref={ref}
     >
-      <primitive object={fbx} dispose={null} />
+      <primitive ref={primitiveRef} object={fbx} dispose={null} />
       <mesh castShadow position={[0, 14, 0]}>
         <sphereGeometry args={[6, 32, 32]} />
       </mesh>
