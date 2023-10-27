@@ -123,10 +123,10 @@ export const useCameraHandler = () => {
     cam.bgColor = data.backgroundColor.start
       .clone()
       .lerp(data.backgroundColor.end, progress);
-    bg.set?.(cam.bgColor.clone());
-    f.color.set(cam.bgColor.clone());
+    bg.set?.(cam.bgColor);
+    f.color.set(cam.bgColor);
     cam.groundColor = data.groundColor.start.clone().lerp(data.groundColor.end, progress);
-    gr.color.set(cam.groundColor.clone());
+    gr.color.set(cam.groundColor);
   };
 
   const _getPlayerPos = () => {
