@@ -82,9 +82,6 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
   }
 
   rollback() {
-    if (this.anim?.rollingBack) {
-      return;
-    }
     this.rewind(2, () => {
       this.focused = undefined;
     });

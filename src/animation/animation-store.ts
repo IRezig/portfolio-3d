@@ -3,7 +3,6 @@ import { Clock } from 'three';
 export interface AnimationType {
   clock: Clock;
   duration: number;
-  rollingBack?: boolean;
   onFinish?: () => void;
 }
 
@@ -17,6 +16,10 @@ export abstract class AnimationStore<T> {
   protected anim?: AnimationType;
   protected dispatcher?: (progress: number) => AnimationStep<T> | undefined;
 
+  timeback: number | null = null;
+  timebackClock: Clock | null = null;
+  savedProgress: number | null = null;
+
   play(duration: number, onFinish?: () => void) {
     this.anim = {
       duration,
@@ -26,35 +29,51 @@ export abstract class AnimationStore<T> {
   }
 
   rewind(duration: number, onFinish?: () => void) {
-    if (this.anim?.rollingBack) {
+    if (this.timebackClock) {
       return;
     }
     if (this.anim) {
+      this.savedProgress = this.anim.clock.getElapsedTime() / this.anim.duration;
+      this.timeback = this.anim.clock.getElapsedTime();
       this.anim.onFinish = onFinish;
-      this.anim.rollingBack = true;
     } else {
+      this.savedProgress = 1;
+      this.timeback = duration;
       this.anim = {
         duration,
         clock: new Clock(),
         onFinish,
-        rollingBack: true,
       };
     }
+    this.timebackClock = new Clock();
   }
 
   runFrame(onProgress: (step: AnimationStep<T> | undefined, p: number) => void) {
     if (!this.anim) {
       return;
     }
-    const { clock, duration } = this.anim;
-    const progress = clock.getElapsedTime() / duration;
-    if (progress <= 1) {
-      const smartProgress = this.anim.rollingBack ? 1 - progress : progress;
-      const step = this.dispatcher?.(smartProgress);
-      onProgress(step, smartProgress);
+
+    if (this.timeback && this.timebackClock && this.savedProgress) {
+      const restProgress = this.timebackClock.getElapsedTime() / this.timeback;
+      const step = this.dispatcher?.(this.savedProgress * (1 - restProgress));
+      onProgress(step, this.savedProgress * (1 - restProgress));
+      if (this.timebackClock.getElapsedTime() >= this.timeback) {
+        this.anim?.onFinish?.();
+        this.anim = undefined;
+        this.timeback = null;
+        this.timebackClock = null;
+        this.savedProgress = null;
+      }
     } else {
-      this.anim.onFinish?.();
-      this.anim = undefined;
+      const { clock, duration } = this.anim;
+      const progress = clock.getElapsedTime() / duration;
+      if (progress <= 1) {
+        const step = this.dispatcher?.(progress);
+        onProgress(step, progress);
+      } else {
+        this.anim.onFinish?.();
+        this.anim = undefined;
+      }
     }
   }
 
