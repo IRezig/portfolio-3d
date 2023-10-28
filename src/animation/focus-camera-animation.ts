@@ -94,7 +94,12 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
   }
 
   rollback() {
-    this.play(2.7, true);
+    if (this.anim) {
+      return;
+    }
+    this.play(2.7, true, () => {
+      this.focused = false;
+    });
   }
 
   /**
