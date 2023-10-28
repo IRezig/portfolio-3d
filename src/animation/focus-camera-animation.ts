@@ -113,7 +113,7 @@ export class FocusAnimationStore {
     ];
   }
 
-  getCurrentStep(_progress: number) {
+  updateCurrentTimeframe(progress: number) {
     if (!this.anim) {
       return null;
     }
@@ -122,28 +122,17 @@ export class FocusAnimationStore {
       return null;
     }
     const [start, end] = currentStep.thresholds;
-    const progress = this.anim.rollingBack ? 1 - _progress : _progress;
     if (progress >= start && progress <= end) {
       return currentStep;
     }
     this.timeframe = undefined;
     if (this.anim.rollingBack) {
-      console.log('rollback', this.anim.stepIndex);
       this.anim.stepIndex--;
     } else {
-      console.log('rollup', this.anim.stepIndex);
       this.anim.stepIndex++;
     }
-    return this.steps[this.anim.stepIndex];
-  }
 
-  updateCurrentTimeframe(progress: number) {
-    const foundStep = this.getCurrentStep(progress);
-    if (!foundStep || this.timeframe) {
-      return null;
-    }
-
-    const { look, pos, bgColor, groundColor } = foundStep.step;
+    const { look, pos, bgColor, groundColor } = currentStep.step;
     const range = <T>(start: T, end: T) => ({
       start,
       end,
@@ -155,20 +144,16 @@ export class FocusAnimationStore {
       backgroundColor: range(this.state.bgColor, bgColor),
       groundColor: range(this.state.groundColor, groundColor),
     };
+    return currentStep;
   }
 
   rollback() {
-    if (!this.anim) {
-      this.anim = {
-        duration: 3,
-        clock: new Clock(),
-        stepIndex: this.steps.length - 1,
-        rollingBack: true,
-      };
-    } else {
-      console.log('letsgo!');
-      this.anim.rollingBack = true;
-    }
+    this.anim = {
+      duration: 3,
+      clock: new Clock(),
+      stepIndex: this.steps.length - 1,
+      rollingBack: true,
+    };
     this.timeframe = undefined;
   }
 
@@ -176,15 +161,7 @@ export class FocusAnimationStore {
     this.anim !== undefined;
   }
 
-  getTimeframeProgress = (progress: number) => {
-    if (!this.anim) {
-      return 0;
-    }
-    const current = this.steps[this.anim.stepIndex];
-    if (!current) {
-      return 0;
-    }
-    const [start, end] = current.thresholds;
+  getTimeframeProgress = (start: number, end: number, progress: number) => {
     const clampedProgress = Math.min(Math.max(progress, start), end);
     return (clampedProgress - start) / (end - start);
   };
@@ -199,12 +176,15 @@ export class FocusAnimationStore {
     const { clock, duration } = this.anim;
     const progress = clock.getElapsedTime() / duration;
     if (progress <= 1) {
-      this.updateCurrentTimeframe(progress);
+      const directionalProgress = this.anim.rollingBack ? 1 - progress : progress;
+      console.log('progress', directionalProgress);
+      const current = this.updateCurrentTimeframe(directionalProgress);
       const frame = this.timeframe;
-      if (!frame) {
+      if (!frame || !current) {
         return;
       }
-      const computedProgress = this.getTimeframeProgress(progress);
+      const [start, end] = current.thresholds;
+      const computedProgress = this.getTimeframeProgress(start, end, directionalProgress);
       this._applyColor(computedProgress, frame, objects);
       this._applyLook(computedProgress, frame, camera);
       this._applyPosition(computedProgress, frame, camera);
