@@ -7,7 +7,7 @@ import config from '../config/config';
 import { useMenuContext } from '../context/menu-context';
 import { ObjectType, useSceneContext } from '../context/scene-context';
 import { isObjectBehind, isObjectInFov } from '../services/vector-helpers';
-import { useCameraHandler } from './use-camera-handler';
+import { useCameraAnimation } from './use-camera-animation';
 import { useKeyDown, useKeyUp } from './use-key-press';
 
 interface NearestObject {
@@ -34,7 +34,7 @@ const keys: Record<string, Record<string, number>> = {
 };
 
 export const usePlayerHandler = () => {
-  const { isFocused, runCameraFrame, unfocusObject, focusObject } = useCameraHandler();
+  const { isFocused, unfocusObject, focusObject } = useCameraAnimation();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
   const { camera } = useThree();
@@ -95,6 +95,7 @@ export const usePlayerHandler = () => {
     }
 
     // Handle focus state
+    console.log('key', key, isFocused());
     if (isFocused()) {
       if (key === SPACE_KEY) {
         unfocusObject();
@@ -206,9 +207,6 @@ export const usePlayerHandler = () => {
 
       checkDistances(player.position);
     }
-
-    // Handle camera
-    runCameraFrame();
   });
 
   return fbxWalk;

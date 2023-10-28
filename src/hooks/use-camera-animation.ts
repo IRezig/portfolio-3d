@@ -1,4 +1,4 @@
-import { useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
 import { Vector3 } from 'three';
 
@@ -8,7 +8,6 @@ import { useSceneContext } from '../context/scene-context';
 export const useCameraAnimation = () => {
   const { camera } = useThree();
   const { objects } = useSceneContext();
-  const focused = useRef(false);
 
   const _getPlayerPos = () => {
     const player = objects.player?.current;
@@ -17,18 +16,18 @@ export const useCameraAnimation = () => {
 
   const animStore = useRef(new FocusAnimationStore());
 
+  const isFocused = () => animStore.current.focused;
+
   const focusObject = (targetPos: Vector3) => {
-    focused.current = true;
     animStore.current.start(targetPos, _getPlayerPos(), camera.position);
   };
 
   const unfocusObject = () => {
-    focused.current = false;
     animStore.current.rollback();
   };
 
-  const runFocusAnimation = () => {
-    if (focused.current) {
+  useFrame(() => {
+    if (animStore.current.focused) {
       // Handle animation
       // ...when it's focused
       animStore.current.run(camera, objects);
@@ -39,16 +38,15 @@ export const useCameraAnimation = () => {
       animStore.current.state.look = _getPlayerPos();
       camera.lookAt(animStore.current.state.look);
     }
-  };
+  });
 
   /**
    * Animation helpers
    */
 
   return {
-    focused,
+    isFocused,
     focusObject,
     unfocusObject,
-    runFocusAnimation,
   };
 };

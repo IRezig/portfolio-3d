@@ -14,6 +14,7 @@ interface AnimationType {
   clock: Clock;
   duration: number;
   stepIndex: number;
+  rollingBack: boolean;
 }
 
 interface AnimationStep<T> {
@@ -65,6 +66,7 @@ export class FocusAnimationStore {
   };
   steps: AnimationStep<FocusAnimState>[] = [];
   timeframe?: AnimationTimeframe;
+  focused = false;
 
   create(
     look: Vector3,
@@ -81,10 +83,12 @@ export class FocusAnimationStore {
   }
 
   start(targetPos: Vector3, playerPos: Vector3, cameraPos: Vector3) {
+    this.focused = true;
     this.anim = {
       duration: 3,
       clock: new Clock(),
       stepIndex: 0,
+      rollingBack: false,
     };
     const alignment = getObjectAligment(targetPos, playerPos, cameraPos);
 
@@ -122,7 +126,11 @@ export class FocusAnimationStore {
       return currentStep;
     }
     this.timeframe = undefined;
-    this.anim.stepIndex++;
+    if (this.anim.rollingBack) {
+      this.anim.stepIndex--;
+    } else {
+      this.anim.stepIndex++;
+    }
     return this.steps[this.anim.stepIndex];
   }
 
@@ -136,14 +144,27 @@ export class FocusAnimationStore {
     const range = <T>(start: T, end: T) => ({ start, end });
     this.timeframe = {
       easing: easings.easeInOutQuad,
-      look: range(this.state.look.clone(), look),
-      position: range(this.state.pos.clone(), pos),
+      look: range(this.state.look.clone(), look.clone()),
+      position: range(this.state.pos.clone(), pos.clone()),
       backgroundColor: range(this.state.bgColor, bgColor),
       groundColor: range(this.state.groundColor, groundColor),
     };
   }
 
-  rollback() {}
+  rollback() {
+    if (!this.anim) {
+      this.anim = {
+        duration: 3,
+        clock: new Clock(),
+        stepIndex: this.steps.length - 1,
+        rollingBack: true,
+      };
+    } else {
+      console.log('letsgo!');
+      this.anim.rollingBack = true;
+      this.timeframe = undefined;
+    }
+  }
 
   isAnimating() {
     this.anim !== undefined;
@@ -170,6 +191,7 @@ export class FocusAnimationStore {
       return;
     }
     const { clock, duration } = this.anim;
+    console.log(clock.getElapsedTime());
     const progress = clock.getElapsedTime() / duration;
     if (progress <= 1) {
       this.updateCurrentTimeframe(progress);
@@ -182,6 +204,9 @@ export class FocusAnimationStore {
       this._applyLook(computedProgress, frame, camera);
       this._applyPosition(computedProgress, frame, camera);
     } else {
+      if (this.anim.rollingBack) {
+        this.focused = false;
+      }
       this.anim = undefined;
       console.log('finished :)');
     }
