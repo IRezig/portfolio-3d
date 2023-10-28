@@ -3,7 +3,6 @@ import { Clock } from 'three';
 export interface AnimationType {
   clock: Clock;
   duration: number;
-  stepIndex: number;
   rollingBack?: boolean;
   onFinish?: () => void;
 }
@@ -24,7 +23,6 @@ export abstract class AnimationStore<T> {
     this.anim = {
       duration,
       clock: new Clock(),
-      stepIndex: backwards ? this.steps.length - 1 : 0,
       rollingBack: backwards,
       onFinish,
     };
