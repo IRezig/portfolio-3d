@@ -13,11 +13,11 @@ extend({ TextGeometry });
 export const Text = ({
   value,
   position,
-  rotation
+  rotation,
 }: {
   value: string;
-  position: Vector3
-  rotation: Euler
+  position: Vector3;
+  rotation: Euler;
 }) => {
   const font = useLoader(FontLoader, './src/assets/Roboto.json');
   const [_, setFontLoaded] = useState(false);
@@ -29,11 +29,7 @@ export const Text = ({
   }, [font]);
 
   return (
-    <mesh 
-      rotation={rotation} 
-      castShadow
-      position={position}
-    >
+    <mesh rotation={rotation} castShadow position={position}>
       <textGeometry args={[value, { font, size: 4, height: 1 }]} />
       <meshStandardMaterial attach="material" color={'gold'} />
     </mesh>
