@@ -4,14 +4,14 @@ import { useRef } from 'react';
 import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 
 import { FocusAnimationStore } from '../animation/focus-camera-animation';
-import config from '../config/config';
-import { useSceneContext } from '../context/scene-context';
-import { useAnimation } from '../hooks/use-animation';
 import {
   FocusAnimationState,
   FocusAnimData,
   FocusAnimStep,
-} from '../interfaces/animations.interfaces';
+} from '../animation/focus-camera-animation';
+import config from '../config/config';
+import { useSceneContext } from '../context/scene-context';
+import { useAnimation } from '../hooks/use-animation';
 import { getObjectAligment } from '../services/vector-helpers';
 
 export const useCameraAnimation = () => {
