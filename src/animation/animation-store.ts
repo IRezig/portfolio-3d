@@ -32,7 +32,7 @@ export abstract class AnimationStore<T> {
     }
     const savedProgress = this.anim
       ? this.anim.clock.getElapsedTime() / this.anim.duration
-      : 0;
+      : undefined;
     this.anim = {
       duration: this.anim?.clock.getElapsedTime() ?? duration,
       clock: new Clock(),
@@ -57,7 +57,7 @@ export abstract class AnimationStore<T> {
       onProgress(step, progress);
     } else {
       const saved = this.anim.savedProgress ?? 1;
-      const restProgress = saved * (1 - progress);
+      const restProgress = saved ? saved * (1 - progress) : progress;
       const step = this.dispatcher?.(restProgress);
       onProgress(step, restProgress);
     }

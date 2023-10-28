@@ -56,6 +56,7 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
       this.player.position,
       this.camera.position,
     );
+    // console.log('Alignment', alignment);
 
     const step0 = {
       pos: this.camera.position.clone(),
@@ -71,18 +72,16 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
       this.createRange(progress, 0, 0.34, step0, step1) ||
       this.createRange(progress, 0.33, 0.8, step1, step2) ||
       this.createRange(progress, 0.79, 1, step2, step3);
-
-    // console.log('Alignment', alignment);
   }
 
   start(targetPos: Vector3) {
     this.focused = targetPos;
-    this.play(3);
+    this.play(3.442);
     this.calculateSteps();
   }
 
   rollback() {
-    this.rewind(2, () => {
+    this.rewind(2.452, () => {
       this.focused = undefined;
     });
   }
@@ -133,7 +132,7 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
       objectPos,
       this.player.position,
       8,
-      angleToPlayer + (side === HeadSide.Left ? -shift : shift),
+      angleToPlayer + (side === HeadSide.Left ? shift : -shift),
     );
     return this.create(
       objectPos,
@@ -147,7 +146,7 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
    * Step 3: Look up
    */
   calculateStepLookUp(prevState: FocusAnimState, objectPos: Vector3) {
-    const pos = prevState.pos.clone().add(new Vector3(0, 0, -5));
+    const pos = prevState.pos.clone().add(new Vector3(0, 2, -5));
     return this.create(
       objectPos,
       pos,
