@@ -95,7 +95,6 @@ export const usePlayerHandler = () => {
     }
 
     // Handle focus state
-    console.log('key', key, isFocused());
     if (isFocused()) {
       if (key === SPACE_KEY) {
         unfocusObject();
