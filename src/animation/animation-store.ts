@@ -57,7 +57,7 @@ export abstract class AnimationStore<T> {
       onProgress(step, progress);
     } else {
       const saved = this.anim.savedProgress ?? 1;
-      const restProgress = saved ? saved * (1 - progress) : progress;
+      const restProgress = saved * (1 - progress);
       const step = this.dispatcher?.(restProgress);
       onProgress(step, restProgress);
     }
