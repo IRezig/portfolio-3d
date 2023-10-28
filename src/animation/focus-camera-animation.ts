@@ -1,6 +1,6 @@
 import { easings } from '@react-spring/three';
 import { Camera } from '@react-three/fiber';
-import { Clock, Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
+import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 
 import config from '../config/config';
 import { ObjectsType } from '../context/scene-context';
@@ -10,26 +10,7 @@ import {
   getPointAroundObject,
   HeadSide,
 } from '../services/vector-helpers';
-
-interface AnimationType {
-  clock: Clock;
-  duration: number;
-  stepIndex: number;
-  rollingBack: boolean;
-}
-
-interface AnimationStep<T> {
-  thresholds: number[];
-  start: T;
-  end: T;
-}
-
-export enum FocusAnimationState {
-  ZoomingOut,
-  FocusingIn,
-  LookingUp,
-  Idle,
-}
+import { AnimationStep, AnimationStore } from './animation-store';
 
 export interface FocusAnimState {
   pos: Vector3;
@@ -38,9 +19,8 @@ export interface FocusAnimState {
   groundColor: Color;
 }
 
-export class FocusAnimationStore {
-  anim?: AnimationType;
-  state: FocusAnimState = {
+export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
+  state = {
     pos: new Vector3(0, 0, 0),
     look: new Vector3(0, 0, 0),
     backgroundColor: new Color(config.scene.backgroundColor),
@@ -65,12 +45,7 @@ export class FocusAnimationStore {
 
   start(targetPos: Vector3, playerPos: Vector3, cameraPos: Vector3) {
     this.focused = true;
-    this.anim = {
-      duration: 3,
-      clock: new Clock(),
-      stepIndex: 0,
-      rollingBack: false,
-    };
+    this.play(3);
     const alignment = getObjectAligment(targetPos, playerPos, cameraPos);
 
     const step0 = { ...this.state };
@@ -81,17 +56,17 @@ export class FocusAnimationStore {
     console.log('Alignment', alignment);
     this.steps = [
       {
-        thresholds: [0, 0.24],
+        thresholds: [0, 0.34],
         start: step0,
         end: step1,
       },
       {
-        thresholds: [0.24, 0.84],
+        thresholds: [0.33, 0.8],
         start: step1,
         end: step2,
       },
       {
-        thresholds: [0.84, 1],
+        thresholds: [0.79, 1],
         start: step2,
         end: step3,
       },
@@ -120,12 +95,7 @@ export class FocusAnimationStore {
   }
 
   rollback() {
-    this.anim = {
-      duration: 3,
-      clock: new Clock(),
-      stepIndex: this.steps.length - 1,
-      rollingBack: true,
-    };
+    this.play(2.7, true);
   }
 
   /**
