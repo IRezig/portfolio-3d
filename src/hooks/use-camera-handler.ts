@@ -1,4 +1,4 @@
-import { useCameraAnimation } from '../animation/focus-camera-animation';
+import { useCameraAnimation } from './use-camera-animation';
 
 export const useCameraHandler = () => {
   const { focused, focusObject, unfocusObject, runFocusAnimation } = useCameraAnimation();
