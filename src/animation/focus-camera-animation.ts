@@ -78,7 +78,7 @@ export class FocusAnimationStore {
     const step2 = this.calculateStepFocusIn(step1, alignment, targetPos, playerPos);
     const step3 = this.calculateStepLookUp(step2, targetPos);
 
-    // console.log('Alignment', alignment);
+    console.log('Alignment', alignment);
     this.steps = [
       {
         thresholds: [0, 0.24],
@@ -142,7 +142,6 @@ export class FocusAnimationStore {
       const directionalProgress = this.anim.rollingBack ? 1 - progress : progress;
       const current = this.updateCurrentTimeframe(directionalProgress);
       if (!current) {
-        console.log('hm');
         return;
       }
       const [start, end] = current.thresholds;
@@ -155,7 +154,6 @@ export class FocusAnimationStore {
         this.focused = false;
       }
       this.anim = undefined;
-      console.log('finished :)');
     }
   }
 
