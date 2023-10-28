@@ -116,7 +116,6 @@ export class FocusAnimationStore {
     } else {
       this.anim.stepIndex++;
     }
-    console.log(this.anim.stepIndex);
     return this.steps[this.anim.stepIndex];
   }
 
