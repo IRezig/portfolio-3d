@@ -172,6 +172,9 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
     );
   }
 
+  /**
+   * Apply Progress
+   */
   _applyLook = (
     progress: number,
     step: AnimationStep<FocusAnimState>,
