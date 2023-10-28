@@ -146,6 +146,7 @@ export const usePlayerHandler = () => {
         isObjectBehind(object.position, currentPos, camera.position) ||
         !isObjectInFov(object.position, currentPos, camera.position, 90)
       ) {
+        console.log('behind');
         continue;
       }
       const distance = currentPos.distanceTo(object.position);

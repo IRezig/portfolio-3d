@@ -8,24 +8,6 @@ export const angleToDegrees = (radians: number) => {
   return radians * (180 / Math.PI);
 };
 
-export const mergeVectors = (
-  v1: Vector3,
-  v2: Vector3,
-  callback: (n: number, d: number) => number,
-) => {
-  const x = callback(v1.x, v2.x);
-  const y = callback(v1.y, v2.y);
-  const z = callback(v1.z, v2.z);
-  return new Vector3(x, y, z);
-};
-
-export const diffVectors = (end: Vector3, start: Vector3) => {
-  const x = end.x - start.x;
-  const y = end.y - start.y;
-  const z = end.z - start.z;
-  return new Vector3(x, y, z);
-};
-
 const dotProduct = (objectPos: Vector3, playerPos: Vector3, cameraPos: Vector3) => {
   const vectorToObject = new Vector3().subVectors(objectPos, playerPos).normalize();
   const vectorToCamera = new Vector3().subVectors(cameraPos, playerPos).normalize();
