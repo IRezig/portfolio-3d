@@ -56,6 +56,11 @@ export const isObjectInFov = (
   return !(degrees < 180 - fov / 2);
 };
 
+export const clampProgress = (progress: number, start: number, end: number) => {
+  const p = Math.min(Math.max(progress, start), end);
+  return (p - start) / (end - start);
+};
+
 export enum HeadSide {
   Left = 'Left',
   Right = 'Right',

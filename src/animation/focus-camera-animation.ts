@@ -5,6 +5,7 @@ import { Clock, Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 import config from '../config/config';
 import { ObjectsType } from '../context/scene-context';
 import {
+  clampProgress,
   getObjectAligment,
   getPointAroundObject,
   HeadSide,
@@ -19,27 +20,8 @@ interface AnimationType {
 
 interface AnimationStep<T> {
   thresholds: number[];
-  step: T;
-}
-
-export interface AnimationTimeframe {
-  easing: (n: number) => number;
-  look: {
-    start: Vector3;
-    end: Vector3;
-  };
-  position: {
-    start: Vector3;
-    end: Vector3;
-  };
-  backgroundColor: {
-    start: Color;
-    end: Color;
-  };
-  groundColor: {
-    start: Color;
-    end: Color;
-  };
+  start: T;
+  end: T;
 }
 
 export enum FocusAnimationState {
@@ -52,7 +34,7 @@ export enum FocusAnimationState {
 export interface FocusAnimState {
   pos: Vector3;
   look: Vector3;
-  bgColor: Color;
+  backgroundColor: Color;
   groundColor: Color;
 }
 
@@ -61,23 +43,22 @@ export class FocusAnimationStore {
   state: FocusAnimState = {
     pos: new Vector3(0, 0, 0),
     look: new Vector3(0, 0, 0),
-    bgColor: new Color(config.scene.backgroundColor),
+    backgroundColor: new Color(config.scene.backgroundColor),
     groundColor: new Color(config.scene.groundColor),
   };
   steps: AnimationStep<FocusAnimState>[] = [];
-  timeframe?: AnimationTimeframe;
   focused = false;
 
   create(
     look: Vector3,
     pos: Vector3,
-    bgColor: string,
+    backgroundColor: string,
     groundColor: string,
   ): FocusAnimState {
     return {
       pos,
       look,
-      bgColor: new Color(bgColor),
+      backgroundColor: new Color(backgroundColor),
       groundColor: new Color(groundColor),
     };
   }
@@ -92,7 +73,8 @@ export class FocusAnimationStore {
     };
     const alignment = getObjectAligment(targetPos, playerPos, cameraPos);
 
-    const step1 = this.calculateStepZoomOut(this.state, playerPos);
+    const step0 = { ...this.state };
+    const step1 = this.calculateStepZoomOut(step0, playerPos);
     const step2 = this.calculateStepFocusIn(step1, alignment, targetPos, playerPos);
     const step3 = this.calculateStepLookUp(step2, targetPos);
 
@@ -100,51 +82,42 @@ export class FocusAnimationStore {
     this.steps = [
       {
         thresholds: [0, 0.24],
-        step: step1,
+        start: step0,
+        end: step1,
       },
       {
         thresholds: [0.24, 0.84],
-        step: step2,
+        start: step1,
+        end: step2,
       },
       {
         thresholds: [0.84, 1],
-        step: step3,
+        start: step2,
+        end: step3,
       },
     ];
   }
 
   updateCurrentTimeframe(progress: number) {
-    if (!this.anim) {
+    if (
+      !this.anim ||
+      this.anim.stepIndex >= this.steps.length ||
+      this.anim.stepIndex < 0
+    ) {
       return null;
     }
     const currentStep = this.steps[this.anim.stepIndex];
-    if (!currentStep) {
-      return null;
-    }
     const [start, end] = currentStep.thresholds;
     if (progress >= start && progress <= end) {
       return currentStep;
     }
-    this.timeframe = undefined;
     if (this.anim.rollingBack) {
       this.anim.stepIndex--;
     } else {
       this.anim.stepIndex++;
     }
-
-    const { look, pos, bgColor, groundColor } = currentStep.step;
-    const range = <T>(start: T, end: T) => ({
-      start,
-      end,
-    });
-    this.timeframe = {
-      easing: easings.easeInOutQuad,
-      look: range(this.state.look.clone(), look.clone()),
-      position: range(this.state.pos.clone(), pos.clone()),
-      backgroundColor: range(this.state.bgColor, bgColor),
-      groundColor: range(this.state.groundColor, groundColor),
-    };
-    return currentStep;
+    console.log(this.anim.stepIndex);
+    return this.steps[this.anim.stepIndex];
   }
 
   rollback() {
@@ -154,17 +127,7 @@ export class FocusAnimationStore {
       stepIndex: this.steps.length - 1,
       rollingBack: true,
     };
-    this.timeframe = undefined;
   }
-
-  isAnimating() {
-    this.anim !== undefined;
-  }
-
-  getTimeframeProgress = (start: number, end: number, progress: number) => {
-    const clampedProgress = Math.min(Math.max(progress, start), end);
-    return (clampedProgress - start) / (end - start);
-  };
 
   /**
    * Run frame
@@ -177,17 +140,16 @@ export class FocusAnimationStore {
     const progress = clock.getElapsedTime() / duration;
     if (progress <= 1) {
       const directionalProgress = this.anim.rollingBack ? 1 - progress : progress;
-      console.log('progress', directionalProgress);
       const current = this.updateCurrentTimeframe(directionalProgress);
-      const frame = this.timeframe;
-      if (!frame || !current) {
+      if (!current) {
+        console.log('hm');
         return;
       }
       const [start, end] = current.thresholds;
-      const computedProgress = this.getTimeframeProgress(start, end, directionalProgress);
-      this._applyColor(computedProgress, frame, objects);
-      this._applyLook(computedProgress, frame, camera);
-      this._applyPosition(computedProgress, frame, camera);
+      const computedProgress = clampProgress(directionalProgress, start, end);
+      this._applyColor(computedProgress, current, objects);
+      this._applyLook(computedProgress, current, camera);
+      this._applyPosition(computedProgress, current, camera);
     } else {
       if (this.anim.rollingBack) {
         this.focused = false;
@@ -255,23 +217,31 @@ export class FocusAnimationStore {
     );
   }
 
-  _applyLook = (progress: number, timeframe: AnimationTimeframe, camera: Camera) => {
-    this.state.look = timeframe.look.start
+  _applyLook = (
+    progress: number,
+    step: AnimationStep<FocusAnimState>,
+    camera: Camera,
+  ) => {
+    this.state.look = step.start.look
       .clone()
-      .lerp(timeframe.look.end, timeframe.easing(progress));
+      .lerp(step.end.look, easings.easeInOutQuad(progress));
     camera.lookAt(this.state.look);
   };
 
-  _applyPosition = (progress: number, timeframe: AnimationTimeframe, camera: Camera) => {
-    this.state.pos = timeframe.position.start
+  _applyPosition = (
+    progress: number,
+    step: AnimationStep<FocusAnimState>,
+    camera: Camera,
+  ) => {
+    this.state.pos = step.start.pos
       .clone()
-      .lerp(timeframe.position.end, timeframe.easing(progress));
+      .lerp(step.end.pos, easings.easeInOutQuad(progress));
     camera.position.copy(this.state.pos);
   };
 
   _applyColor = (
     progress: number,
-    timeframe: AnimationTimeframe,
+    step: AnimationStep<FocusAnimState>,
     objects: ObjectsType,
   ) => {
     const { background, ground, fog } = objects;
@@ -281,14 +251,14 @@ export class FocusAnimationStore {
     const f = fog.current as unknown as Fog;
     const gr = ground.current as unknown as MeshPhongMaterial;
     const bg = background.current as unknown as Color;
-    this.state.bgColor = timeframe.backgroundColor.start
+    this.state.backgroundColor = step.start.backgroundColor
       .clone()
-      .lerp(timeframe.backgroundColor.end, timeframe.easing(progress));
-    bg.set?.(this.state.bgColor);
-    f.color.set(this.state.bgColor);
-    this.state.groundColor = timeframe.groundColor.start
+      .lerp(step.end.backgroundColor, easings.easeInOutQuad(progress));
+    bg.set?.(this.state.backgroundColor);
+    f.color.set(this.state.backgroundColor);
+    this.state.groundColor = step.start.groundColor
       .clone()
-      .lerp(timeframe.groundColor.end, progress);
+      .lerp(step.end.groundColor, progress);
     gr.color.set(this.state.groundColor);
   };
 }
