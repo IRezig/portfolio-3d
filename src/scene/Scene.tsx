@@ -1,7 +1,6 @@
 import { Html, useProgress } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { RefObject, Suspense, useRef, useState } from 'react';
-import { Vector3 } from 'three';
 
 import { Loader } from '../components/Loader';
 import config from '../config/config';
@@ -48,7 +47,7 @@ export const Scene = () => {
           {/* Objects */}
           <Player />
           <Ground />
-          <ReactNativePlace position={new Vector3(0, 10, -30)} />
+          <ReactNativePlace />
           {/* 
           <AccumulativeShadows
             temporal

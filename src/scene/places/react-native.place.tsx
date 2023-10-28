@@ -25,7 +25,7 @@ export const ReactNativePlace = () => {
         <Atom />
       </Float>
       <Text value={'React-Native'} position={textPos} rotation={textRotation} />
-      <TargetSpotlight targetPosition={new Vector3(0, 0, -10)} />
+      <TargetSpotlight targetPosition={new Vector3(0, 20, -10)} />
     </group>
   );
 };
