@@ -27,6 +27,7 @@ export interface FocusAnimData {
 export enum FocusAnimationState {
   ZoomingOut,
   FocusingIn,
+  LookingUp,
   Idle,
 }
 
@@ -35,18 +36,26 @@ export interface FocusAnimStep {
   look: Vector3;
   bgColor: Color;
   groundColor: Color;
+  duration: number;
 }
 
 export class FocusAnimationStore extends AnimationStore<
   FocusAnimStep,
   FocusAnimationState
 > {
-  create(look: Vector3, pos: Vector3, bgColor: string, groundColor: string) {
+  create(
+    look: Vector3,
+    pos: Vector3,
+    bgColor: string,
+    groundColor: string,
+    duration: number,
+  ) {
     return {
       pos,
       look,
       bgColor: new Color(bgColor),
       groundColor: new Color(groundColor),
+      duration,
     };
   }
 
@@ -68,6 +77,7 @@ export class FocusAnimationStore extends AnimationStore<
       offsetBackwardPosition,
       config.scene.backgroundColor,
       config.scene.groundColor,
+      0.2,
     );
   }
 
@@ -81,18 +91,29 @@ export class FocusAnimationStore extends AnimationStore<
     const finalPosition = getPointAroundObject(
       objectPos,
       playerPos,
-      15,
-      angleToPlayer + (side === HeadSide.Left ? shift : -shift),
+      8,
+      angleToPlayer + (side === HeadSide.Left ? -shift : shift),
     );
     return this.create(
       objectPos,
       finalPosition,
       config.scene.groundColor,
       config.scene.darkGroundColor,
+      1.2,
     );
   }
 
   /**
    * Step 3: Look up
    */
+  calculateStepLookUp(objectPos: Vector3) {
+    const pos = this.state.pos.clone().add(new Vector3(0, 4, -10));
+    return this.create(
+      objectPos,
+      pos,
+      config.scene.groundColor,
+      config.scene.darkGroundColor,
+      1.3,
+    );
+  }
 }

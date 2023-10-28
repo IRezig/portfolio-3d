@@ -31,6 +31,7 @@ export const useCameraAnimation = () => {
       pos: camera.position.clone(),
       bgColor: new Color(config.scene.backgroundColor),
       groundColor: new Color(config.scene.groundColor),
+      duration: 0,
     }),
   );
 
@@ -45,7 +46,7 @@ export const useCameraAnimation = () => {
     const alignment = getObjectAligment(targetPos, playerPos, camera.position);
     console.log('Alignment', alignment);
 
-    _animateToStep(0.64, zoomOutStep, easings.easeInOutQuad, () => {
+    _animateToStep(zoomOutStep, easings.easeInOutQuad, () => {
       // Save in history
       animStore.current.update(FocusAnimationState.ZoomingOut, zoomOutStep);
       const focusingStep = animStore.current.calculateStepFocusIn(
@@ -54,25 +55,37 @@ export const useCameraAnimation = () => {
         playerPos,
       );
 
-      _animateToStep(
-        config.camera.focusDuration,
-        focusingStep,
-        easings.easeInOutQuad,
-        () => {
-          animStore.current.update(FocusAnimationState.FocusingIn, focusingStep);
-        },
-      );
+      _animateToStep(focusingStep, easings.easeInOutQuad, () => {
+        animStore.current.update(FocusAnimationState.FocusingIn, focusingStep);
+
+        const lookingUpStep = animStore.current.calculateStepLookUp(targetPos);
+        _animateToStep(lookingUpStep, easings.easeInOutQuad, () => {
+          animStore.current.update(FocusAnimationState.LookingUp, lookingUpStep);
+        });
+      });
     });
   };
 
   const unfocusObject = () => {
-    const oldStep = animStore.current.getStateFor(FocusAnimationState.ZoomingOut);
-    _animateToStep(config.camera.unfocusDuration, oldStep, easings.easeInOutQuad, () => {
-      animStore.current.update(FocusAnimationState.ZoomingOut, oldStep);
+    const focusingInRollback = animStore.current.getStateFor(
+      FocusAnimationState.FocusingIn,
+    );
+    focusingInRollback.duration = 1;
+    _animateToStep(focusingInRollback, easings.easeInOutQuad, () => {
+      animStore.current.update(FocusAnimationState.FocusingIn, focusingInRollback);
+      const zoomingOutRollback = animStore.current.getStateFor(
+        FocusAnimationState.ZoomingOut,
+      );
+      zoomingOutRollback.duration = 1.4;
 
-      const initialStep = animStore.current.getStateFor(FocusAnimationState.Idle);
-      _animateToStep(0.4, initialStep, easings.easeInOutQuad, () => {
-        focused.current = false;
+      _animateToStep(zoomingOutRollback, easings.easeInOutQuad, () => {
+        animStore.current.update(FocusAnimationState.ZoomingOut, zoomingOutRollback);
+        const initialStep = animStore.current.getStateFor(FocusAnimationState.Idle);
+        initialStep.duration = 0.3;
+
+        _animateToStep(initialStep, easings.easeInOutQuad, () => {
+          focused.current = false;
+        });
       });
     });
   };
@@ -100,11 +113,11 @@ export const useCameraAnimation = () => {
    */
 
   const _animateToStep = (
-    duration: number,
     step: FocusAnimStep,
     easing: (n: number) => number = (n) => n,
     callback?: () => void,
   ) => {
+    console.log('duration', step.duration);
     const interpolator = <T>(start: T, end: T) => ({
       start,
       end,
@@ -123,7 +136,7 @@ export const useCameraAnimation = () => {
           new Color(step.groundColor),
         ),
       },
-      duration,
+      step.duration,
       callback,
     );
   };
