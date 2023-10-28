@@ -16,3 +16,16 @@ html,
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+.bounce {
+  animation: bounce 2s infinite ease-in-out;
+}

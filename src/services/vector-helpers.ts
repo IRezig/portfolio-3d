@@ -64,3 +64,19 @@ export const getObjectAligment = (
   const direction = Math.sign(crossProduct.y);
   return direction === 1 ? HeadSide.Left : HeadSide.Right;
 };
+
+export const getPointAroundObject = (
+  objectPos: Vector3,
+  playerPos: Vector3,
+  height: number,
+  angle: number,
+) => {
+  const distance = playerPos.distanceTo(objectPos);
+  const point = new Vector3(
+    objectPos.x + distance * Math.cos(angle),
+    height,
+    objectPos.z + distance * Math.sin(angle),
+  );
+
+  return point;
+};

@@ -6,41 +6,17 @@ import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 import config from '../config/config';
 import { useSceneContext } from '../context/scene-context';
 import { useAnimation } from '../hooks/use-animation';
-import { getObjectAligment, HeadSide } from '../services/vector-helpers';
+import {
+  FocusAnimationState,
+  FocusAnimData,
+  FocusAnimStep,
+} from '../interfaces/animations.interfaces';
+import {
+  getObjectAligment,
+  getPointAroundObject,
+  HeadSide,
+} from '../services/vector-helpers';
 import { AnimationStore } from './animation-store';
-
-export interface FocusAnimData {
-  easing: (n: number) => number;
-  look: {
-    start: Vector3;
-    end: Vector3;
-  };
-  position: {
-    start: Vector3;
-    end: Vector3;
-  };
-  backgroundColor: {
-    start: Color;
-    end: Color;
-  };
-  groundColor: {
-    start: Color;
-    end: Color;
-  };
-}
-
-export enum FocusAnimationState {
-  ZoomingOut,
-  FocusingIn,
-  Idle,
-}
-
-export interface FocusAnimStep {
-  pos: Vector3;
-  look: Vector3;
-  bgColor: Color;
-  groundColor: Color;
-}
 
 export class FocusAnimationStore extends AnimationStore<
   FocusAnimStep,
@@ -76,27 +52,16 @@ export const useCameraAnimation = () => {
     }),
   );
 
-  const findPointOnCircle = (objectPos: Vector3, height: number, angle: number) => {
-    const playerPos = _getPlayerPos();
-    const distance = playerPos.distanceTo(objectPos);
-    const point = new Vector3(
-      objectPos.x + distance * Math.cos(angle),
-      height,
-      objectPos.z + distance * Math.sin(angle),
-    );
-
-    return point;
-  };
-
   const calculateFocusPosition = (side: HeadSide, objectPos: Vector3) => {
     const shift = (Math.PI * 1) / 8;
     const playerPos = _getPlayerPos();
     const delta = new Vector3().subVectors(playerPos, objectPos);
-    const angleToObject = Math.atan2(delta.z, delta.x);
-    const res = findPointOnCircle(
+    const angleToPlayer = Math.atan2(delta.z, delta.x);
+    const res = getPointAroundObject(
       objectPos,
+      playerPos,
       15,
-      side === HeadSide.Left ? angleToObject + shift : angleToObject - shift,
+      angleToPlayer + (side === HeadSide.Left ? shift : -shift),
     );
     return res;
   };
