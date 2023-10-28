@@ -1,3 +1,4 @@
+import { Html, useProgress } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { RefObject, Suspense, useRef, useState } from 'react';
 
@@ -12,6 +13,15 @@ import { Ground } from './objects/Ground';
 import { Player } from './objects/Player';
 import { SecondBall } from './objects/SecondBall';
 import { Text } from './objects/Text';
+
+const Progress = () => {
+  const { progress } = useProgress();
+  return (
+    <Html fullscreen>
+      <Loader progress={progress} />
+    </Html>
+  );
+};
 
 export const Scene = () => {
   const [objects, setObjects] = useState<SceneContextType['objects']>({});
@@ -30,7 +40,7 @@ export const Scene = () => {
   return (
     <SceneContext.Provider value={{ objects, exposeObject, destroyObject }}>
       <Canvas shadows camera={{ position: config.camera.initialPosition }}>
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Progress />}>
           {/* Ambiance */}
           <Horizon />
           <Lights />

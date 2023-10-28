@@ -1,21 +1,16 @@
-import { Html, useProgress } from '@react-three/drei';
-
 import config from '../config/config';
 
-export function Loader() {
-  const { progress } = useProgress();
+export const Loader = ({ progress }: { progress: number }) => {
   return (
-    <Html fullscreen>
-      <div
-        className="flex height-[100%] flex-1 justify-center items-center"
-        style={{
-          backgroundColor: config.scene.backgroundColor,
-        }}
-      >
-        <div className="text-white font-bold font-size-lg">
-          {Number(progress).toFixed(0)}%
-        </div>
+    <div
+      className="flex h-full justify-center items-center"
+      style={{
+        backgroundColor: config.scene.backgroundColor,
+      }}
+    >
+      <div className="text-white bounce font-bold text-3xl">
+        {Number(progress).toFixed(0)}%
       </div>
-    </Html>
+    </div>
   );
-}
+};

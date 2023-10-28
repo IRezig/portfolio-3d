@@ -4,7 +4,7 @@ import { MenuContext } from '../context/menu-context';
 
 export const Menu = ({ children }: { children: React.ReactNode }) => {
   const [shown, showMenu] = useState(false);
-
+  //return <Loader progress={100} />;
   return (
     <MenuContext.Provider value={{ shown, showMenu }}>
       {children}
