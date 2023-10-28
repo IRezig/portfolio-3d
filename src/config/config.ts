@@ -23,7 +23,7 @@ export default {
   },
   places: {
     ball: {
-      initialPosition: new Vector3(0, 4, -40),
+      initialPosition: new Vector3(0, 4, -100),
       zoomFocusOffset: new Vector3(0, 4, 0),
     },
   },

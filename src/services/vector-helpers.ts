@@ -4,6 +4,10 @@ export const angleToRad = (degrees: number) => {
   return (Math.PI / 180) * degrees;
 };
 
+export const angleToDegrees = (radians: number) => {
+  return radians * (180 / Math.PI);
+};
+
 export const mergeVectors = (
   v1: Vector3,
   v2: Vector3,

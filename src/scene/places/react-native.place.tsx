@@ -4,6 +4,7 @@ import { Euler, Group, Vector3 } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
+import { angleToRad } from '../../services/vector-helpers';
 import { Atom } from '../objects/Atom';
 import { TargetSpotlight } from '../objects/TargetSpotlight';
 import { Text } from '../objects/Text';
@@ -17,20 +18,26 @@ export const ReactNativePlace = () => {
   }, []);
 
   const origin = config.places.ball.initialPosition;
-  const textPos = new Vector3(-16, -origin.y - 0.7, 8);
+  const textPos = new Vector3(-16, 1.1, 8);
   const textRotation = new Euler(-Math.PI / 2, 0, 0);
   return (
     <>
       <group ref={ref} position={origin}>
         <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
-          <Atom />
+          <Atom position={new Vector3(0, 10, 0)} />
         </Float>
-        <Text value={'React-Native'} position={textPos} rotation={textRotation} />
+        <group position={new Vector3(0, 2, 0)} rotation={[angleToRad(20), 0, 0]}>
+          <Text value={'React-Native'} position={textPos} rotation={textRotation} />
+          <mesh castShadow position={[0, 0, 0]}>
+            <boxGeometry args={[38, 4, 24]} />
+            <meshStandardMaterial color={'grey'} />
+          </mesh>
+        </group>
       </group>
       <TargetSpotlight
-        distance={120}
-        intensity={1000}
-        targetPosition={new Vector3(origin.x, 20, origin.z - 1)}
+        distance={210}
+        intensity={1200}
+        targetPosition={new Vector3(origin.x, 39, origin.z - 10)}
       />
     </>
   );

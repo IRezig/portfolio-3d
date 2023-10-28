@@ -6,9 +6,9 @@ export const Lights = () => {
       {/* Light */}
       <directionalLight
         castShadow
-        position={[-100, 20, -100]}
+        position={[20, 20, 40]}
         color="white"
-        intensity={1}
+        intensity={0.4}
         shadow-mapSize-width={10000}
         shadow-mapSize-height={10000}
         shadow-camera-far={400}
