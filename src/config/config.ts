@@ -1,7 +1,7 @@
 import { Vector3 } from 'three';
 
-const CAMERA_HEIGHT = 20;
-const CAMERA_DISTANCE = 40;
+const CAMERA_HEIGHT = 24;
+const CAMERA_DISTANCE = 34;
 
 export default {
   scene: {
