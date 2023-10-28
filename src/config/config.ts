@@ -21,13 +21,10 @@ export default {
   player: {
     initialPosition: new Vector3(0, 0, 0),
   },
-  objects: {
+  places: {
     ball: {
       initialPosition: new Vector3(0, 4, -40),
       zoomFocusOffset: new Vector3(0, 4, 0),
-    },
-    secondBall: {
-      initialPosition: new Vector3(-30, 4, -120),
     },
   },
 };

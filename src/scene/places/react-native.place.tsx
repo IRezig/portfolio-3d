@@ -4,10 +4,11 @@ import { Euler, Group, Vector3 } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
-import { Atom } from './Atom';
-import { Text } from './Text';
+import { Atom } from '../objects/Atom';
+import { TargetSpotlight } from '../objects/TargetSpotlight';
+import { Text } from '../objects/Text';
 
-export const Ball = () => {
+export const ReactNativePlace = () => {
   const ref = useRef<Group>(null);
   const { exposeObject } = useSceneContext();
 
@@ -15,7 +16,7 @@ export const Ball = () => {
     exposeObject('ball', ref);
   }, []);
 
-  const origin = config.objects.ball.initialPosition;
+  const origin = config.places.ball.initialPosition;
   const textPos = new Vector3(-16, -origin.y - 0.7, 8);
   const textRotation = new Euler(-Math.PI / 2, 0, 0);
   return (
@@ -24,6 +25,7 @@ export const Ball = () => {
         <Atom />
       </Float>
       <Text value={'React-Native'} position={textPos} rotation={textRotation} />
+      <TargetSpotlight targetPosition={new Vector3(0, 0, -10)} />
     </group>
   );
 };

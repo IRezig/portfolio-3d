@@ -2,11 +2,9 @@
 
 import { extend, useLoader } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
-import { Euler, Mesh, Vector3 } from 'three';
+import { Euler, Vector3 } from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
-import { useSceneContext } from '../../context/scene-context';
-import config from '../../config/config';
 
 extend({ TextGeometry });
 
@@ -19,6 +17,7 @@ export const Text = ({
   position: Vector3;
   rotation: Euler;
 }) => {
+  const _font = useLoader(FontLoader, './src/assets/Inter.json');
   const font = useLoader(FontLoader, './src/assets/Roboto.json');
   const [_, setFontLoaded] = useState(false);
   const toggle = useRef(false);

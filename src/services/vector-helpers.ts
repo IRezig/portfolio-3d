@@ -1,5 +1,9 @@
 import { Vector3 } from 'three';
 
+export const angleToRad = (degrees: number) => {
+  return (Math.PI / 180) * degrees;
+};
+
 export const mergeVectors = (
   v1: Vector3,
   v2: Vector3,
