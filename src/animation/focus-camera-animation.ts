@@ -1,7 +1,7 @@
 import { easings } from '@react-spring/three';
 import { useThree } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Color, Euler, Fog, MeshPhongMaterial, Vector3 } from 'three';
+import { Color, Fog, MeshPhongMaterial, Vector3 } from 'three';
 
 import config from '../config/config';
 import { useSceneContext } from '../context/scene-context';
@@ -66,10 +66,6 @@ export const useCameraAnimation = () => {
     const player = objects.player?.current;
     return player?.position.clone() ?? new Vector3(0, 0, 0);
   };
-  const _getPlayerRotation = () => {
-    const player = objects.player?.current;
-    return player?.rotation.clone() ?? new Euler(0, 0, 0);
-  };
 
   const animStore = useRef(
     new FocusAnimationStore({
@@ -80,15 +76,29 @@ export const useCameraAnimation = () => {
     }),
   );
 
-  const rotateVector = (vector: Vector3, rotation: Euler) => {
-    const angleY = rotation.y;
-    const cosY = Math.cos(angleY);
-    const sinY = Math.sin(angleY);
-    return new Vector3(
-      cosY * vector.x - sinY * vector.z,
-      vector.y,
-      sinY * vector.x + cosY * vector.z,
+  const findPointOnCircle = (objectPos: Vector3, height: number, angle: number) => {
+    const playerPos = _getPlayerPos();
+    const distance = playerPos.distanceTo(objectPos);
+    const point = new Vector3(
+      objectPos.x + distance * Math.cos(angle),
+      height,
+      objectPos.z + distance * Math.sin(angle),
     );
+
+    return point;
+  };
+
+  const calculateFocusPosition = (side: HeadSide, objectPos: Vector3) => {
+    const shift = (Math.PI * 1) / 8;
+    const playerPos = _getPlayerPos();
+    const delta = new Vector3().subVectors(playerPos, objectPos);
+    const angleToObject = Math.atan2(delta.z, delta.x);
+    const res = findPointOnCircle(
+      objectPos,
+      15,
+      side === HeadSide.Left ? angleToObject + shift : angleToObject - shift,
+    );
+    return res;
   };
 
   /**
@@ -105,6 +115,7 @@ export const useCameraAnimation = () => {
       .add(new Vector3(1, 1, 0));
 
     const alignment = getObjectAligment(targetLook, playerPos, camera.position);
+    console.log('Alignment', alignment);
 
     const zoomOutStep = animStore.current.create(
       playerPos,
@@ -116,14 +127,7 @@ export const useCameraAnimation = () => {
 
     _animateToStep(0.64, zoomOutStep, easings.easeInOutQuad, () => {
       animStore.current.update(FocusAnimationState.ZoomingOut, zoomOutStep);
-      const vec = new Vector3().subVectors(targetLook, playerPos).normalize();
-      const offset = vec.multiplyScalar(-22);
-      const targetPosition = new Vector3().addVectors(playerPos, offset);
-      const smallShift = rotateVector(
-        new Vector3(alignment === HeadSide.Left ? 14 : -14, 14, 0),
-        _getPlayerRotation(),
-      );
-      const finalPosition = new Vector3().addVectors(targetPosition, smallShift);
+      const finalPosition = calculateFocusPosition(alignment, targetLook);
       const focusingStep = animStore.current.create(
         targetLook,
         finalPosition,
