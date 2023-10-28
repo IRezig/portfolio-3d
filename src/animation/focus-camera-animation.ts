@@ -95,15 +95,15 @@ export class FocusAnimationStore {
     // console.log('Alignment', alignment);
     this.steps = [
       {
-        thresholds: [0, 0.33],
+        thresholds: [0, 0.24],
         step: step1,
       },
       {
-        thresholds: [0.33, 0.66],
+        thresholds: [0.24, 0.84],
         step: step2,
       },
       {
-        thresholds: [0.66, 0.99],
+        thresholds: [0.84, 1],
         step: step3,
       },
     ];
