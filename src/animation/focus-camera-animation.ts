@@ -26,7 +26,6 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
     backgroundColor: new Color(config.scene.backgroundColor),
     groundColor: new Color(config.scene.groundColor),
   };
-  steps: AnimationStep<FocusAnimState>[] = [];
   focused = false;
 
   create(
