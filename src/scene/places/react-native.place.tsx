@@ -29,8 +29,8 @@ export const ReactNativePlace = () => {
       </group>
       <TargetSpotlight
         distance={120}
-        intensity={300}
-        targetPosition={new Vector3(origin.x, 20, origin.z)}
+        intensity={1000}
+        targetPosition={new Vector3(origin.x, 20, origin.z - 1)}
       />
     </>
   );
