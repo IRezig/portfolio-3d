@@ -2,9 +2,10 @@ import { createContext, RefObject, useContext } from 'react';
 import { Group, Mesh } from 'three';
 
 export type ObjectType = Mesh | Group;
+export type ObjectsType = Record<string, RefObject<ObjectType> | undefined>;
 
 export interface SceneContextType {
-  objects: Record<string, RefObject<ObjectType> | undefined>;
+  objects: ObjectsType;
   exposeObject: (key: string, obj: RefObject<ObjectType>) => void;
   destroyObject: (key: string) => void;
 }

@@ -35,7 +35,6 @@ export const useAnimationClip = (
     action.setLoop(LoopOnce, 1);
     action.clampWhenFinished = true;
     action.play();
-    console.log('play');
     return action;
   };
 
