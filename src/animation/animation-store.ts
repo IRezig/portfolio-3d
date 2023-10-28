@@ -29,12 +29,17 @@ export abstract class AnimationStore<T> {
     if (this.anim?.rollingBack) {
       return;
     }
-    this.anim = {
-      duration,
-      clock: new Clock(),
-      onFinish,
-      rollingBack: true,
-    };
+    if (this.anim) {
+      this.anim.onFinish = onFinish;
+      this.anim.rollingBack = true;
+    } else {
+      this.anim = {
+        duration,
+        clock: new Clock(),
+        onFinish,
+        rollingBack: true,
+      };
+    }
   }
 
   runFrame(onProgress: (step: AnimationStep<T> | undefined, p: number) => void) {
