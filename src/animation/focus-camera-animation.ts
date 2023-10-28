@@ -77,7 +77,7 @@ export class FocusAnimationStore extends AnimationStore<
       offsetBackwardPosition,
       config.scene.backgroundColor,
       config.scene.groundColor,
-      0.2,
+      1.4,
     );
   }
 
@@ -107,13 +107,13 @@ export class FocusAnimationStore extends AnimationStore<
    * Step 3: Look up
    */
   calculateStepLookUp(objectPos: Vector3) {
-    const pos = this.state.pos.clone().add(new Vector3(0, 4, -10));
+    const pos = this.state.pos.clone().add(new Vector3(0, 0, -5));
     return this.create(
       objectPos,
       pos,
-      config.scene.groundColor,
       config.scene.darkGroundColor,
-      1.3,
+      config.scene.darkGroundColor,
+      0.7,
     );
   }
 }

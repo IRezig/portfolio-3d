@@ -81,7 +81,7 @@ export const useCameraAnimation = () => {
       _animateToStep(zoomingOutRollback, easings.easeInOutQuad, () => {
         animStore.current.update(FocusAnimationState.ZoomingOut, zoomingOutRollback);
         const initialStep = animStore.current.getStateFor(FocusAnimationState.Idle);
-        initialStep.duration = 0.3;
+        initialStep.duration = 1.1;
 
         _animateToStep(initialStep, easings.easeInOutQuad, () => {
           focused.current = false;
