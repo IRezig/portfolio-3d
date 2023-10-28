@@ -52,45 +52,12 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
     const step2 = this.calculateStepFocusIn(step1, alignment, targetPos, playerPos);
     const step3 = this.calculateStepLookUp(step2, targetPos);
 
-    console.log('Alignment', alignment);
-    this.steps = [
-      {
-        thresholds: [0, 0.34],
-        start: step0,
-        end: step1,
-      },
-      {
-        thresholds: [0.33, 0.8],
-        start: step1,
-        end: step2,
-      },
-      {
-        thresholds: [0.79, 1],
-        start: step2,
-        end: step3,
-      },
-    ];
-  }
+    this.dispatcher = (progress: number) =>
+      this.createRange(progress, 0, 0.34, step0, step1) ||
+      this.createRange(progress, 0.33, 0.8, step1, step2) ||
+      this.createRange(progress, 0.79, 1, step2, step3);
 
-  updateCurrentTimeframe(progress: number) {
-    if (
-      !this.anim ||
-      this.anim.stepIndex >= this.steps.length ||
-      this.anim.stepIndex < 0
-    ) {
-      return null;
-    }
-    const currentStep = this.steps[this.anim.stepIndex];
-    const [start, end] = currentStep.thresholds;
-    if (progress >= start && progress <= end) {
-      return currentStep;
-    }
-    if (this.anim.rollingBack) {
-      this.anim.stepIndex--;
-    } else {
-      this.anim.stepIndex++;
-    }
-    return this.steps[this.anim.stepIndex];
+    console.log('Alignment', alignment);
   }
 
   rollback() {
@@ -106,8 +73,7 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
    * Run frame
    */
   run(camera: Camera, objects: ObjectsType) {
-    this.runFrame((progress) => {
-      const current = this.updateCurrentTimeframe(progress);
+    this.runFrame((current, progress) => {
       if (!current) {
         return;
       }

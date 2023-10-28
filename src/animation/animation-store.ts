@@ -18,6 +18,7 @@ export abstract class AnimationStore<T> {
   protected state!: T;
   protected anim?: AnimationType;
   protected steps: AnimationStep<T>[] = [];
+  protected dispatcher?: (progress: number) => AnimationStep<T> | undefined;
 
   play(duration: number, backwards = false, onFinish?: () => void) {
     this.anim = {
@@ -29,7 +30,7 @@ export abstract class AnimationStore<T> {
     };
   }
 
-  runFrame(onProgress: (p: number) => void) {
+  runFrame(onProgress: (step: AnimationStep<T> | undefined, p: number) => void) {
     if (!this.anim) {
       return;
     }
@@ -37,10 +38,27 @@ export abstract class AnimationStore<T> {
     const progress = clock.getElapsedTime() / duration;
     if (progress <= 1) {
       const directionalProgress = this.anim.rollingBack ? 1 - progress : progress;
-      onProgress(directionalProgress);
+      const step = this.dispatcher?.(directionalProgress);
+      onProgress(step, directionalProgress);
     } else {
       this.anim.onFinish?.();
       this.anim = undefined;
     }
+  }
+
+  createRange(
+    progress: number,
+    startThreshold: number,
+    endThreshold: number,
+    startState: T,
+    endState: T,
+  ) {
+    return progress < endThreshold
+      ? {
+          thresholds: [startThreshold, endThreshold],
+          start: startState,
+          end: endState,
+        }
+      : undefined;
   }
 }
