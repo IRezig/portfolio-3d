@@ -2,23 +2,26 @@
 
 import { extend, useLoader } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
-import { Mesh } from 'three';
+import { Euler, Mesh, Vector3 } from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { useSceneContext } from '../../context/scene-context';
+import config from '../../config/config';
 
 extend({ TextGeometry });
 
-export const Text = () => {
-  const font = useLoader(FontLoader, './src/assets/Roboto-Bold.json');
+export const Text = ({
+  value,
+  position,
+  rotation
+}: {
+  value: string;
+  position: Vector3
+  rotation: Euler
+}) => {
+  const font = useLoader(FontLoader, './src/assets/Roboto.json');
   const [_, setFontLoaded] = useState(false);
   const toggle = useRef(false);
-  const ref = useRef<Mesh>(null);
-  const { exposeObject } = useSceneContext();
-
-  useEffect(() => {
-    exposeObject('text', ref);
-  }, []);
 
   useEffect(() => {
     toggle.current = !toggle.current;
@@ -26,9 +29,13 @@ export const Text = () => {
   }, [font]);
 
   return (
-    <mesh ref={ref} castShadow {...{ position: [30, 5, -120] }}>
-      <textGeometry args={['test', { font, size: 4, height: 3 }]} />
-      <meshLambertMaterial attach="material" color={'gold'} />
+    <mesh 
+      rotation={rotation} 
+      castShadow
+      position={position}
+    >
+      <textGeometry args={[value, { font, size: 4, height: 1 }]} />
+      <meshStandardMaterial attach="material" color={'gold'} />
     </mesh>
   );
 };

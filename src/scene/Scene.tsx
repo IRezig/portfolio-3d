@@ -12,7 +12,6 @@ import { Ball } from './objects/Ball';
 import { Ground } from './objects/Ground';
 import { Player } from './objects/Player';
 import { SecondBall } from './objects/SecondBall';
-import { Text } from './objects/Text';
 
 const Progress = () => {
   const { progress } = useProgress();
@@ -51,7 +50,6 @@ export const Scene = () => {
           <SecondBall />
           <Player />
           <Ground />
-          <Text />
         </Suspense>
       </Canvas>
     </SceneContext.Provider>
