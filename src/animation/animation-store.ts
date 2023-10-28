@@ -14,17 +14,26 @@ export interface AnimationStep<T> {
 }
 
 export abstract class AnimationStore<T> {
-  protected state!: T;
   protected anim?: AnimationType;
-  protected steps: AnimationStep<T>[] = [];
   protected dispatcher?: (progress: number) => AnimationStep<T> | undefined;
 
-  play(duration: number, backwards = false, onFinish?: () => void) {
+  play(duration: number, onFinish?: () => void) {
     this.anim = {
       duration,
       clock: new Clock(),
-      rollingBack: backwards,
       onFinish,
+    };
+  }
+
+  rewind(duration: number, onFinish?: () => void) {
+    if (this.anim?.rollingBack) {
+      return;
+    }
+    this.anim = {
+      duration,
+      clock: new Clock(),
+      onFinish,
+      rollingBack: true,
     };
   }
 
@@ -35,9 +44,9 @@ export abstract class AnimationStore<T> {
     const { clock, duration } = this.anim;
     const progress = clock.getElapsedTime() / duration;
     if (progress <= 1) {
-      const directionalProgress = this.anim.rollingBack ? 1 - progress : progress;
-      const step = this.dispatcher?.(directionalProgress);
-      onProgress(step, directionalProgress);
+      const smartProgress = this.anim.rollingBack ? 1 - progress : progress;
+      const step = this.dispatcher?.(smartProgress);
+      onProgress(step, smartProgress);
     } else {
       this.anim.onFinish?.();
       this.anim = undefined;
@@ -51,7 +60,7 @@ export abstract class AnimationStore<T> {
     startState: T,
     endState: T,
   ) {
-    return progress < endThreshold
+    return progress >= startThreshold && progress < endThreshold
       ? {
           thresholds: [startThreshold, endThreshold],
           start: startState,

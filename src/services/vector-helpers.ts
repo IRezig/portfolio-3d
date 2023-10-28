@@ -85,11 +85,9 @@ export const getPointAroundObject = (
   angle: number,
 ) => {
   const distance = playerPos.distanceTo(objectPos);
-  const point = new Vector3(
+  return new Vector3(
     objectPos.x + distance * Math.cos(angle),
     height,
     objectPos.z + distance * Math.sin(angle),
   );
-
-  return point;
 };
