@@ -102,28 +102,17 @@ export class FocusAnimationStore extends AnimationStore<FocusAnimState> {
    * Run frame
    */
   run(camera: Camera, objects: ObjectsType) {
-    if (!this.anim) {
-      return;
-    }
-    const { clock, duration } = this.anim;
-    const progress = clock.getElapsedTime() / duration;
-    if (progress <= 1) {
-      const directionalProgress = this.anim.rollingBack ? 1 - progress : progress;
-      const current = this.updateCurrentTimeframe(directionalProgress);
+    this.runFrame((progress) => {
+      const current = this.updateCurrentTimeframe(progress);
       if (!current) {
         return;
       }
       const [start, end] = current.thresholds;
-      const computedProgress = clampProgress(directionalProgress, start, end);
+      const computedProgress = clampProgress(progress, start, end);
       this._applyColor(computedProgress, current, objects);
       this._applyLook(computedProgress, current, camera);
       this._applyPosition(computedProgress, current, camera);
-    } else {
-      if (this.anim.rollingBack) {
-        this.focused = false;
-      }
-      this.anim = undefined;
-    }
+    });
   }
 
   /**
