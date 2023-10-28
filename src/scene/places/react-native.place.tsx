@@ -20,12 +20,18 @@ export const ReactNativePlace = () => {
   const textPos = new Vector3(-16, -origin.y - 0.7, 8);
   const textRotation = new Euler(-Math.PI / 2, 0, 0);
   return (
-    <group ref={ref} position={origin}>
-      <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
-        <Atom />
-      </Float>
-      <Text value={'React-Native'} position={textPos} rotation={textRotation} />
-      <TargetSpotlight targetPosition={new Vector3(0, 20, -10)} />
-    </group>
+    <>
+      <group ref={ref} position={origin}>
+        <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
+          <Atom />
+        </Float>
+        <Text value={'React-Native'} position={textPos} rotation={textRotation} />
+      </group>
+      <TargetSpotlight
+        distance={120}
+        intensity={300}
+        targetPosition={new Vector3(origin.x, 20, origin.z)}
+      />
+    </>
   );
 };
