@@ -7,19 +7,14 @@ export function Loader() {
   return (
     <Html fullscreen>
       <div
+        className="flex height-[100%] flex-1 justify-center items-center"
         style={{
-          display: 'flex',
-          flex: 1,
-          height: '100%',
-          justifyContent: 'center',
-          alignItems: 'center',
           backgroundColor: config.scene.backgroundColor,
-          color: '#fff',
-          fontWeight: 'bold',
-          fontSize: 42,
         }}
       >
-        {Number(progress).toFixed(0)}%
+        <div className="text-white font-bold font-size-lg">
+          {Number(progress).toFixed(0)}%
+        </div>
       </div>
     </Html>
   );

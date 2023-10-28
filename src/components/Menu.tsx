@@ -9,24 +9,9 @@ export const Menu = ({ children }: { children: React.ReactNode }) => {
     <MenuContext.Provider value={{ shown, showMenu }}>
       {children}
       {shown ? (
-        <div
-          style={{
-            position: 'fixed',
-            height: 120,
-            background: 'rgba(255, 255, 255, 0.1)',
-            left: '20%',
-            right: '20%',
-            bottom: '10%',
-            borderRadius: 10,
-            zIndex: 10,
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <div style={{ fontSize: 22, textAlign: 'center' }}>
-            Press `SPACE` to view more
+        <div className="fixed flex left-0 right-0 bottom-[5%] justify-center items-center">
+          <div className="px-12 py-6 bounce bg-opacity-10 bg-white bottom-[10%] rounded-lg z-10 text-white">
+            <div className="text-sm font-bold uppercase">Press `SPACE` to view more</div>
           </div>
         </div>
       ) : null}
