@@ -1,4 +1,4 @@
-import { Float } from '@react-three/drei';
+import { Float, OrbitControls } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Euler, Group, Vector3 } from 'three';
@@ -8,6 +8,25 @@ import { angleToRad } from '../../services/vector-helpers';
 import { Atom } from '../objects/Atom';
 import { TargetSpotlight } from '../objects/TargetSpotlight';
 import { Text } from '../objects/Text';
+
+const Wall = (props: GroupProps) => {
+  return (
+    <mesh castShadow {...props}>
+      <boxGeometry args={[2, 15, 25]} />
+      <meshStandardMaterial color={'red'} />
+    </mesh>
+  );
+};
+
+const Room = (props: GroupProps) => {
+  return (
+    <group {...props}>
+      <Wall position={[0, 0, -10, 2]} />
+      <Wall position={[-5, 2.5, 0]} />
+      <Wall position={[5, 2.5, 0]} />
+    </group>
+  );
+};
 
 export const TheBesmaPlace = (props: GroupProps) => {
   const { position = new Vector3() } = props;
@@ -23,10 +42,15 @@ export const TheBesmaPlace = (props: GroupProps) => {
   return (
     <>
       <group ref={ref} {...props}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        <OrbitControls />
+        <Room />
+        <Wall position={[100, 0, -60]} />
         <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
-          <Atom position={new Vector3(0, 10, 0)} />
+          <Atom position={new Vector3(100, 10, 0)} />
         </Float>
-        <group position={new Vector3(0, 2, 0)} rotation={[angleToRad(20), 0, 0]}>
+        <group position={new Vector3(100, 2, 0)} rotation={[angleToRad(20), 0, 0]}>
           <Text value={'Besma'} position={textPos} rotation={textRotation} />
           <mesh castShadow position={[0, 0, 0]}>
             <boxGeometry args={[38, 4, 24]} />
