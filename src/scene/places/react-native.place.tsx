@@ -9,6 +9,77 @@ import { Atom } from '../objects/Atom';
 import { TargetSpotlight } from '../objects/TargetSpotlight';
 import { Text } from '../objects/Text';
 
+const Cloud = (props: GroupProps) => {
+  return (
+    <group {...props}>
+      {/* Main Circle */}
+      <mesh position={[0, 0, 0]} castShadow>
+        <sphereGeometry args={[5, 32, 32]} />
+        <meshStandardMaterial color={'white'} />
+      </mesh>
+
+      {/* Top-Left Circle */}
+      <mesh position={[-3, 3, 0]} castShadow>
+        <sphereGeometry args={[3, 32, 32]} />
+        <meshStandardMaterial color={'white'} />
+      </mesh>
+
+      {/* Top-Right Circle */}
+      <mesh position={[3, 3, 0]} castShadow>
+        <sphereGeometry args={[3, 32, 32]} />
+        <meshStandardMaterial color={'white'} />
+      </mesh>
+
+      {/* Bottom-Left Circle */}
+      <mesh position={[-4, -1, 0]} castShadow>
+        <sphereGeometry args={[2.5, 32, 32]} />
+        <meshStandardMaterial color={'white'} />
+      </mesh>
+
+      {/* Bottom-Right Circle */}
+      <mesh position={[4, -1, 0]} castShadow>
+        <sphereGeometry args={[2.5, 32, 32]} />
+        <meshStandardMaterial color={'white'} />
+      </mesh>
+    </group>
+  );
+};
+
+const Trophy = (props: GroupProps) => {
+  return (
+    <group {...props}>
+      {/* Base */}
+      <mesh position={[0, -5, 0]} castShadow>
+        <cylinderGeometry args={[3, 3, 1, 32]} />
+        <meshStandardMaterial color={'brown'} />
+      </mesh>
+
+      {/* Body */}
+      <mesh position={[0, 0, 0]} castShadow>
+        <cylinderGeometry args={[2, 2, 10, 32]} />
+        <meshStandardMaterial color={'gold'} />
+      </mesh>
+
+      {/* Top */}
+      <mesh position={[0, 6, 0]} castShadow>
+        <coneGeometry args={[0, 3, 2, 32]} />
+        <meshStandardMaterial color={'gold'} />
+      </mesh>
+    </group>
+  );
+};
+
+const Wall = (props: GroupProps) => {
+  return (
+    <group {...props}>
+      <mesh castShadow>
+        <boxGeometry args={[70, 40, 2]} />
+        <meshStandardMaterial color={'grey'} />
+      </mesh>
+    </group>
+  );
+};
+
 export const ReactNativePlace = (props: GroupProps) => {
   const { position = new Vector3() } = props;
   const ref = useRef<Group>(null);
@@ -23,6 +94,15 @@ export const ReactNativePlace = (props: GroupProps) => {
   return (
     <>
       <group ref={ref} {...props}>
+        <Cloud position={new Vector3(0, 20, 0)} />
+        <Trophy position={new Vector3(-24, 2, 4)} />
+        <Trophy position={new Vector3(24, 2, 0)} />
+        <Wall
+          rotation={new Euler(0, -Math.PI / 2, 0)}
+          position={new Vector3(-34, 0, 0)}
+        />
+        <Wall rotation={new Euler(0, -Math.PI / 2, 0)} position={new Vector3(34, 0, 0)} />
+        <Wall rotation={new Euler(0, 0, 0)} position={new Vector3(0, 0, -34)} />
         <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
           <Atom position={new Vector3(0, 10, 0)} />
         </Float>
