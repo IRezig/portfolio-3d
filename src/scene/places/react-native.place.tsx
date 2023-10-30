@@ -9,6 +9,30 @@ import { Atom } from '../objects/Atom';
 import { TargetSpotlight } from '../objects/TargetSpotlight';
 import { Text } from '../objects/Text';
 
+const Stairs = (props: GroupProps) => {
+  const stepCount = 5; // Number of steps
+  const stepHeight = 1; // Height of each step
+  const initialWidth = 30; // Width of the first step
+  const widthIncrement = 2; // Amount by which each step's width increases
+
+  return (
+    <group {...props}>
+      {Array.from({ length: stepCount }).map((_, index) => {
+        const yPosition = stepHeight * index;
+        const width = initialWidth - widthIncrement * index;
+        const depth = 10; // Depth remains constant for simplicity
+
+        return (
+          <mesh key={index} position={[0, yPosition, 0]} castShadow>
+            <boxGeometry args={[width, stepHeight, depth]} />
+            <meshStandardMaterial color={'gray'} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+};
+
 const Cloud = (props: GroupProps) => {
   return (
     <group {...props}>
@@ -94,6 +118,7 @@ export const ReactNativePlace = (props: GroupProps) => {
   return (
     <>
       <group ref={ref} {...props}>
+        <Stairs position={new Vector3(0, 0, 35)} />
         <Cloud position={new Vector3(0, 20, 0)} />
         <Trophy position={new Vector3(-24, 2, 4)} />
         <Trophy position={new Vector3(24, 2, 0)} />
