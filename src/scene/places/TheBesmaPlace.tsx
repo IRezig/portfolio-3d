@@ -9,11 +9,30 @@ import { Atom } from '../objects/Atom';
 import { TargetSpotlight } from '../objects/TargetSpotlight';
 import { Text } from '../objects/Text';
 
+const PictureFrame = (props: GroupProps) => {
+  return (
+    <group {...props}>
+      <mesh castShadow>
+        <boxGeometry args={[6, 6, 1]} />
+        <meshStandardMaterial color={'white'} />
+      </mesh>
+      <mesh position={[0, 0, 0.5]} castShadow>
+        <boxGeometry args={[4, 4, 1]} />
+        <meshStandardMaterial color={'black'} />
+      </mesh>
+      <mesh position={[0, 0, 0.6]} castShadow>
+        <boxGeometry args={[2, 2, 1]} />
+        <meshStandardMaterial color={'red'} />
+      </mesh>
+    </group>
+  );
+};
+
 const Wall = (props: GroupProps) => {
   return (
     <mesh castShadow {...props}>
-      <boxGeometry args={[2, 15, 25]} />
-      <meshStandardMaterial color={'red'} />
+      <boxGeometry args={[1, 16, 30]} />
+      <meshStandardMaterial color={'green'} />
     </mesh>
   );
 };
@@ -21,9 +40,10 @@ const Wall = (props: GroupProps) => {
 const Room = (props: GroupProps) => {
   return (
     <group {...props}>
-      <Wall position={[0, 0, -10, 2]} />
-      <Wall position={[-5, 2.5, 0]} />
-      <Wall position={[5, 2.5, 0]} />
+      <PictureFrame position={[0, 5, -14]} />
+      <Wall position={[0, 0, -15]} rotation={new Euler(0, Math.PI / 2, 0)} />
+      <Wall position={[-15, 2.5, 0]} />
+      <Wall position={[15, 2.5, 0]} />
     </group>
   );
 };
@@ -34,7 +54,7 @@ export const TheBesmaPlace = (props: GroupProps) => {
   const { exposeObject } = useSceneContext();
 
   useEffect(() => {
-    exposeObject('ball', ref);
+    exposeObject('besma', ref);
   }, []);
 
   const textPos = new Vector3(-16, 1.1, 8);
