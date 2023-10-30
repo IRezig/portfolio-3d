@@ -1,3 +1,4 @@
+import { useBox } from '@react-three/cannon';
 import { useEffect, useRef } from 'react';
 import { Group, Mesh } from 'three';
 
@@ -10,7 +11,8 @@ export const Player = () => {
   const { exposeObject } = useSceneContext();
   const scale = 0.05;
 
-  const fbx = usePlayerHandler();
+  const [playerRef, api] = useBox(() => ({ mass: 1 }));
+  const fbx = usePlayerHandler(api);
   if (fbx) {
     fbx.castShadow = true;
     fbx.traverse((children) => {
@@ -26,12 +28,12 @@ export const Player = () => {
   return (
     <group
       scale={[scale, scale, scale]}
-      rotation={[0, Math.PI, 0]}
+      rotation={config.player.initialRotation}
       position={config.player.initialPosition}
       ref={ref}
     >
       <primitive object={fbx} />
-      <mesh castShadow position={[0, 14, 0]}>
+      <mesh ref={playerRef} castShadow position={[0, 14, 0]}>
         <sphereGeometry args={[6, 32, 32]} />
       </mesh>
     </group>

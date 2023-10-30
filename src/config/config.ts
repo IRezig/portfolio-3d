@@ -20,6 +20,7 @@ export default {
   },
   player: {
     initialPosition: new Vector3(0, 0, 0),
+    initialRotation: new Euler(0, Math.PI * 2, 0),
   },
   places: {
     ju: {

@@ -1,3 +1,4 @@
+import { useBox } from '@react-three/cannon';
 import { Float } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
@@ -94,10 +95,11 @@ const Trophy = (props: GroupProps) => {
 };
 
 const Wall = (props: GroupProps) => {
+  const [ref] = useBox(() => ({ mass: 0, ...props }));
   return (
-    <group {...props}>
+    <group ref={ref}>
       <mesh castShadow>
-        <boxGeometry args={[70, 40, 2]} />
+        <boxGeometry args={[70, 20, 2]} />
         <meshStandardMaterial color={'grey'} />
       </mesh>
     </group>
@@ -112,7 +114,6 @@ export const ReactNativePlace = (props: GroupProps) => {
   useEffect(() => {
     exposeObject('ball', ref);
   }, []);
-
   const textPos = new Vector3(-16, 1.1, 8);
   const textRotation = new Euler(-Math.PI / 2, 0, 0);
   return (
@@ -124,10 +125,10 @@ export const ReactNativePlace = (props: GroupProps) => {
         <Trophy position={new Vector3(24, 2, 0)} />
         <Wall
           rotation={new Euler(0, -Math.PI / 2, 0)}
-          position={new Vector3(-34, 0, 0)}
+          position={new Vector3(-50, 6, 0)}
         />
-        <Wall rotation={new Euler(0, -Math.PI / 2, 0)} position={new Vector3(34, 0, 0)} />
-        <Wall rotation={new Euler(0, 0, 0)} position={new Vector3(0, 0, -34)} />
+        <Wall rotation={new Euler(0, -Math.PI / 2, 0)} position={new Vector3(34, 6, 0)} />
+        <Wall rotation={new Euler(0, 0, 0)} position={new Vector3(0, 6, -34)} />
         <Float speed={20} rotationIntensity={0.04} floatIntensity={2}>
           <Atom position={new Vector3(0, 10, 0)} />
         </Float>

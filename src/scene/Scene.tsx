@@ -1,3 +1,4 @@
+import { Debug, Physics } from '@react-three/cannon';
 import { Html, useProgress } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { RefObject, Suspense, useRef, useState } from 'react';
@@ -41,30 +42,34 @@ export const Scene = () => {
       <Canvas shadows camera={{ position: config.camera.initialPosition }}>
         <Suspense fallback={<Progress />}>
           {/* Ambiance */}
-          <Horizon />
-          <Lights />
-          <Effects />
+          <Physics gravity={[0, -9.81, 0]}>
+            <Debug>
+              <Horizon />
+              <Lights />
+              <Effects />
 
-          {/* Objects */}
-          <Player />
-          <Ground />
-          <ReactNativePlace
-            rotation={config.places.ju.rotation}
-            position={config.places.ju.initialPosition}
-          />
-          <TheBesmaPlace position={config.places.besma.initialPosition} />
-          {/* 
-          <AccumulativeShadows
-            temporal
-            frames={10}
-            color="#9d4b4b"
-            colorBlend={0.5}
-            alphaTest={0.9}
-            scale={100}
-            position={[0, 0.01, 0]}
-          >
-            <RandomizedLight amount={8} radius={4} position={[5, 5, -10]} />
-          </AccumulativeShadows> */}
+              {/* Objects */}
+              <Player />
+              <Ground />
+              <ReactNativePlace
+                rotation={config.places.ju.rotation}
+                position={config.places.ju.initialPosition}
+              />
+              <TheBesmaPlace position={config.places.besma.initialPosition} />
+              {/* 
+              <AccumulativeShadows
+                temporal
+                frames={10}
+                color="#9d4b4b"
+                colorBlend={0.5}
+                alphaTest={0.9}
+                scale={100}
+                position={[0, 0.01, 0]}
+              >
+                <RandomizedLight amount={8} radius={4} position={[5, 5, -10]} />
+              </AccumulativeShadows> */}
+            </Debug>
+          </Physics>
         </Suspense>
       </Canvas>
     </SceneContext.Provider>

@@ -1,3 +1,4 @@
+import { PublicApi } from '@react-three/cannon';
 import { useFrame, useLoader, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
 import { AnimationMixer, Group, Vector3 } from 'three';
@@ -33,7 +34,7 @@ const keys: Record<string, Record<string, number>> = {
   },
 };
 
-export const usePlayerHandler = () => {
+export const usePlayerHandler = (api: PublicApi) => {
   const { isFocused, unfocusObject, focusObject } = useCameraAnimation();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
@@ -75,6 +76,8 @@ export const usePlayerHandler = () => {
   useKeyDown(({ key }: KeyboardEvent) => {
     // Handle movements
     if (keys.xAxis?.[key]) {
+      api.velocity.set(orientation.x * 10, 0, 0);
+
       orientation.x = keys.xAxis[key];
       if (orientation.x > 0) {
         playAnimation(fbxSideStepLeft);
@@ -83,6 +86,8 @@ export const usePlayerHandler = () => {
       }
     }
     if (keys.zAxis?.[key]) {
+      api.velocity.set(0, 0, orientation.z * 10);
+
       orientation.z = keys.zAxis[key];
       if (orientation.z > 0) {
         playAnimation(fbxWalk);
@@ -197,12 +202,10 @@ export const usePlayerHandler = () => {
       camera.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
 
       // Keep camera behind the player
-      if (orientation.y !== 0) {
-        const offset = forward.clone().multiplyScalar(-config.camera.distance);
-        const camPos = player.position.clone();
-        camPos.y = config.camera.height;
-        camera.position.copy(camPos).add(offset);
-      }
+      const offset = forward.clone().multiplyScalar(-config.camera.distance);
+      const camPos = player.position.clone();
+      camPos.y = config.camera.height;
+      camera.position.copy(camPos).add(offset);
 
       checkDistances(player.position);
     }
