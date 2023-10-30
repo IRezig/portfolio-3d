@@ -9,7 +9,7 @@ import { Atom } from '../objects/Atom';
 import { TargetSpotlight } from '../objects/TargetSpotlight';
 import { Text } from '../objects/Text';
 
-export const ReactNativePlace = (props: GroupProps) => {
+export const TheBesmaPlace = (props: GroupProps) => {
   const { position = new Vector3() } = props;
   const ref = useRef<Group>(null);
   const { exposeObject } = useSceneContext();
@@ -27,7 +27,7 @@ export const ReactNativePlace = (props: GroupProps) => {
           <Atom position={new Vector3(0, 10, 0)} />
         </Float>
         <group position={new Vector3(0, 2, 0)} rotation={[angleToRad(20), 0, 0]}>
-          <Text value={'Ju'} position={textPos} rotation={textRotation} />
+          <Text value={'Besma'} position={textPos} rotation={textRotation} />
           <mesh castShadow position={[0, 0, 0]}>
             <boxGeometry args={[38, 4, 24]} />
             <meshStandardMaterial color={'grey'} />

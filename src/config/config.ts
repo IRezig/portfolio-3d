@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Euler, Vector3 } from 'three';
 
 const CAMERA_HEIGHT = 24;
 const CAMERA_DISTANCE = 34;
@@ -22,9 +22,12 @@ export default {
     initialPosition: new Vector3(0, 0, 0),
   },
   places: {
-    ball: {
+    ju: {
+      initialPosition: new Vector3(0, 4, 100),
+      rotation: new Euler(0, -Math.PI, 0),
+    },
+    besma: {
       initialPosition: new Vector3(0, 4, -100),
-      zoomFocusOffset: new Vector3(0, 4, 0),
     },
   },
 };

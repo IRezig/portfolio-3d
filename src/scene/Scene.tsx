@@ -6,11 +6,12 @@ import { Loader } from '../components/Loader';
 import config from '../config/config';
 import { ObjectType, SceneContext, SceneContextType } from '../context/scene-context';
 import { Effects } from './ambiance/Effects';
-import { Horizon } from './ambiance/horizon';
-import { Lights } from './ambiance/lights';
+import { Horizon } from './ambiance/Horizon';
+import { Lights } from './ambiance/Lights';
 import { Ground } from './objects/Ground';
 import { Player } from './objects/Player';
 import { ReactNativePlace } from './places/react-native.place';
+import { TheBesmaPlace } from './places/TheBesmaPlace';
 
 const Progress = () => {
   const { progress } = useProgress();
@@ -47,7 +48,11 @@ export const Scene = () => {
           {/* Objects */}
           <Player />
           <Ground />
-          <ReactNativePlace />
+          <ReactNativePlace
+            rotation={config.places.ju.rotation}
+            position={config.places.ju.initialPosition}
+          />
+          <TheBesmaPlace position={config.places.besma.initialPosition} />
           {/* 
           <AccumulativeShadows
             temporal
