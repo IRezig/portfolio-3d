@@ -1,17 +1,24 @@
 import { useBox } from '@react-three/cannon';
 import { useEffect, useRef } from 'react';
-import { Group, Mesh } from 'three';
+import { Mesh } from 'three';
 
 import config from '../../config/config';
 import { useSceneContext } from '../../context/scene-context';
 import { usePlayerHandler } from '../../hooks/use-player-handler';
 
 export const Player = () => {
-  const ref = useRef<Group>(null);
   const { exposeObject } = useSceneContext();
   const scale = 0.05;
 
-  const [playerRef, api] = useBox(() => ({ mass: 1 }));
+  const [playerRef, api] = useBox(
+    () => ({
+      mass: 1,
+      position: config.player.initialPosition.toArray(),
+      rotation: config.player.initialRotation,
+      fixedRotation: true,
+    }),
+    useRef,
+  );
   const fbx = usePlayerHandler(api);
   if (fbx) {
     fbx.castShadow = true;
@@ -22,19 +29,14 @@ export const Player = () => {
     });
   }
   useEffect(() => {
-    exposeObject('player', ref);
+    exposeObject('playerCannon', playerRef);
   }, []);
 
   return (
-    <group
-      scale={[scale, scale, scale]}
-      rotation={config.player.initialRotation}
-      position={config.player.initialPosition}
-      ref={ref}
-    >
+    <group scale={[scale, scale, scale]} ref={playerRef}>
       <primitive object={fbx} />
-      <mesh ref={playerRef} castShadow position={[0, 14, 0]}>
-        <sphereGeometry args={[6, 32, 32]} />
+      <mesh castShadow>
+        <boxGeometry args={[30, 32, 32]} />
       </mesh>
     </group>
   );

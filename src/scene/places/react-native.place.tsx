@@ -95,16 +95,18 @@ const Trophy = (props: GroupProps) => {
 };
 
 const Wall = (props: GroupProps) => {
-  const [ref] = useBox(() => ({
-    mass: 0,
-  }));
+  const [ref] = useBox(
+    () => ({
+      mass: 0,
+      ...props,
+    }),
+    useRef,
+  );
   return (
-    <group ref={ref}>
-      <mesh {...props} castShadow>
-        <boxGeometry args={[70, 20, 2]} />
-        <meshStandardMaterial color={'grey'} />
-      </mesh>
-    </group>
+    <mesh castShadow {...props} ref={ref}>
+      <boxGeometry args={[70, 20, 2]} />
+      <meshStandardMaterial color={'grey'} />
+    </mesh>
   );
 };
 

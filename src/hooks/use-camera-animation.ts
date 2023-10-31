@@ -11,15 +11,15 @@ export const useCameraAnimation = () => {
   const animStore = useRef(new FocusAnimationStore(camera));
 
   useEffect(() => {
-    if (objects.player?.current) {
-      animStore.current.player = objects.player?.current;
+    if (objects.playerCannon?.current) {
+      animStore.current.player = objects.playerCannon?.current;
     }
   }, [objects]);
 
   const isFocused = () => animStore.current.focused;
 
   const focusObject = (targetPos: Vector3) => {
-    const player = objects.player?.current;
+    const player = objects.playerCannon?.current;
     if (!player) {
       return;
     }
@@ -30,18 +30,11 @@ export const useCameraAnimation = () => {
     animStore.current.rollback();
   };
 
-  const _getPlayerPos = () => {
-    const player = objects.player?.current;
-    return player?.position.clone() ?? new Vector3(0, 0, 0);
-  };
-
   useFrame(() => {
     if (animStore.current.focused) {
       // Handle animation
       // ...when it's focused
       animStore.current.run(objects);
-    } else {
-      camera.lookAt(_getPlayerPos());
     }
   });
 

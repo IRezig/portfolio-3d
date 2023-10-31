@@ -11,7 +11,7 @@ export const Ground = () => {
   const { exposeObject } = useSceneContext();
   const [groundRef] = usePlane(() => ({
     rotation: [-Math.PI / 2, 0, 0],
-    position: [0, 0, 0],
+    position: [0, -2, 0],
   }));
 
   useEffect(() => {

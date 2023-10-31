@@ -1,3 +1,4 @@
+import { Triplet } from '@react-three/cannon';
 import { Euler, Vector3 } from 'three';
 
 const CAMERA_HEIGHT = 24;
@@ -20,7 +21,7 @@ export default {
   },
   player: {
     initialPosition: new Vector3(0, 0, 0),
-    initialRotation: new Euler(0, Math.PI * 2, 0),
+    initialRotation: [0, Math.PI, 0] as Triplet,
   },
   places: {
     ju: {

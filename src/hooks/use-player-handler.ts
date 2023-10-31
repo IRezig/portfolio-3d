@@ -25,8 +25,8 @@ const keys: Record<string, Record<string, number>> = {
     e: -1,
   },
   zAxis: {
-    ArrowDown: -1,
-    ArrowUp: 1,
+    ArrowDown: 1,
+    ArrowUp: -1,
   },
   yAxis: {
     ArrowRight: -1,
@@ -35,10 +35,10 @@ const keys: Record<string, Record<string, number>> = {
 };
 
 export const usePlayerHandler = (api: PublicApi) => {
-  const { isFocused, unfocusObject, focusObject } = useCameraAnimation();
   const { objects } = useSceneContext();
   const { shown: menuShown, showMenu } = useMenuContext();
   const { camera } = useThree();
+  const { isFocused, unfocusObject, focusObject } = useCameraAnimation(api);
   const isPlaying = useRef(false);
   const nearestObject = useRef<NearestObject>({});
   const fbxWalk = useLoader(FBXLoader, './src/assets/walk.fbx');
@@ -76,8 +76,6 @@ export const usePlayerHandler = (api: PublicApi) => {
   useKeyDown(({ key }: KeyboardEvent) => {
     // Handle movements
     if (keys.xAxis?.[key]) {
-      api.velocity.set(orientation.x * 10, 0, 0);
-
       orientation.x = keys.xAxis[key];
       if (orientation.x > 0) {
         playAnimation(fbxSideStepLeft);
@@ -86,8 +84,6 @@ export const usePlayerHandler = (api: PublicApi) => {
       }
     }
     if (keys.zAxis?.[key]) {
-      api.velocity.set(0, 0, orientation.z * 10);
-
       orientation.z = keys.zAxis[key];
       if (orientation.z > 0) {
         playAnimation(fbxWalk);
@@ -139,7 +135,12 @@ export const usePlayerHandler = (api: PublicApi) => {
       object: undefined,
     };
     for (const key in objects) {
-      if (key === 'player' || key === 'fog' || key === 'background' || key === 'ground') {
+      if (
+        key === 'playerCannon' ||
+        key === 'fog' ||
+        key === 'background' ||
+        key === 'ground'
+      ) {
         continue;
       }
 
@@ -167,47 +168,75 @@ export const usePlayerHandler = (api: PublicApi) => {
     updateMenuState(distance < DISTANCE_RANGE);
   };
 
-  const turn = (degrees: number) => {
-    return (Math.PI / 180) * degrees;
+  // const turn = (degrees: number) => {
+  //   return (Math.PI / 180) * degrees;
+  // };
+
+  // const getOrientationVector = (rotation: number) => {
+  //   return new Vector3(Math.sin(rotation), 0, Math.cos(rotation));
+  // };
+
+  // const getOrientationVectorSideways = (rotation: number) => {
+  //   return new Vector3(Math.cos(rotation), 0, -Math.sin(rotation));
+  // };
+
+  // const getMovementVector = (rotation: number) => {
+  //   return getOrientationVector(rotation).add(getOrientationVectorSideways(rotation));
+  // };
+
+  const knownRotation = useRef(0);
+  const knownPos = useRef(new Vector3());
+  api.rotation.subscribe((newRotation) => {
+    const rotationY = newRotation[1];
+    knownRotation.current = rotationY;
+  });
+
+  api.position.subscribe((newPosition) => {
+    knownPos.current.set(...newPosition);
+  });
+
+  const rotatedMove = (vec: Vector3, rotation: number) => {
+    const rX = vec.x * Math.cos(rotation) - vec.z * Math.sin(rotation);
+    const rZ = vec.x * Math.sin(rotation) + vec.z * Math.cos(rotation);
+    return new Vector3(rX, 0, rZ);
   };
 
-  const getOrientationVector = (rotation: number) => {
-    return new Vector3(Math.sin(rotation), 0, Math.cos(rotation));
+  const normalizeAngle = (angle: number) => {
+    if (angle < 0) {
+      return 0;
+    }
+    return angle;
   };
 
-  const getOrientationVectorSideways = (rotation: number) => {
-    return new Vector3(Math.cos(rotation), 0, -Math.sin(rotation));
+  const movePlayer = (rotation: number) => {
+    const step = 50;
+    const move = rotatedMove(new Vector3(orientation.x, 0, orientation.z), rotation);
+    api.velocity.set(move.x * step, 0, move.z * step);
+    api.angularVelocity.set(0, orientation.y, 0);
   };
 
-  useFrame(({ camera }, delta) => {
+  const moveCamera = (playerPos: Vector3, rotation: number) => {
+    const rotationNorm = normalizeAngle(rotation);
+    console.log('norm', rotationNorm);
+    const baseRotation = -Math.PI / 2;
+    const cameraX =
+      playerPos.x - config.camera.distance * Math.cos(rotationNorm + baseRotation);
+    const cameraZ =
+      playerPos.z - config.camera.distance * Math.sin(rotationNorm + baseRotation);
+    const cameraY = playerPos.y + config.camera.height;
+    camera.position.set(cameraX, cameraY, cameraZ);
+    camera.lookAt(knownPos.current);
+  };
+
+  useFrame((_, delta) => {
     mixer.current?.update(delta);
 
-    // Handle player movement
     if (!isFocused()) {
-      const player = objects.player?.current;
-      if (!player) {
-        return;
-      }
-      // Turn player
-      player.rotation.y += turn(orientation.y);
-
-      // Calculate "forward" vector
-      const forward = getOrientationVector(player.rotation.y);
-      player.position.add(forward.clone().multiplyScalar(orientation.z));
-      camera.position.add(forward.clone().multiplyScalar(orientation.z));
-
-      // Calculate "sideways" vector
-      const sideways = getOrientationVectorSideways(player.rotation.y);
-      player.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
-      camera.position.add(sideways.clone().multiplyScalar(orientation.x / 8));
-
-      // Keep camera behind the player
-      const offset = forward.clone().multiplyScalar(-config.camera.distance);
-      const camPos = player.position.clone();
-      camPos.y = config.camera.height;
-      camera.position.copy(camPos).add(offset);
-
-      checkDistances(player.position);
+      const playerPos = knownPos.current;
+      const rotation = knownRotation.current;
+      movePlayer(rotation);
+      moveCamera(playerPos, rotation);
+      checkDistances(playerPos);
     }
   });
 
